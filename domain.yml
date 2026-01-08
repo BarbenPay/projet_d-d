@@ -2,32 +2,90 @@ version: "2.0"
 
 intents:
   - greet
-  - goodbye
   - affirm
   - deny
-  - mood_great
-  - mood_unhappy
-  - bot_challenge
+  - inform
+  - request_help
+  - start_character_creation
+
+entities:
+  - character_name
+  - race
+  - subrace
+  - class
+  - weapon
+
+slots:
+  character_name:
+    type: text
+    influence_conversation: true
+
+  race:
+    type: text
+    influence_conversation: true
+
+  subrace:
+    type: text
+    influence_conversation: true
+
+  class:
+    type: text
+    influence_conversation: true
+
+  weapon:
+    type: text
+    influence_conversation: true
 
 responses:
   utter_greet:
-  - text: "Hey! How are you?"
+    - text: "Hello adventurer! Ready to create your character?"
 
-  utter_cheer_up:
-  - text: "Here is something to cheer you up:"
-    image: "https://i.imgur.com/nGF1K8f.jpg"
+  utter_help:
+    - text: "I can help you create a D&D character: name, race, class, weapon, and more."
 
-  utter_did_that_help:
-  - text: "Did that help you?"
+  utter_start_character_creation:
+    - text: "Great! Let's start creating your character."
 
-  utter_happy:
-  - text: "Great, carry on!"
+  utter_ask_character_name:
+    - text: "What is your character's name?"
 
-  utter_goodbye:
-  - text: "Bye"
+  utter_ask_race:
+    - text: "Choose a race (Human, Elf, Dwarf, Halfling)."
 
-  utter_iamabot:
-  - text: "I am a bot, powered by Rasa."
+  utter_ask_class:
+    - text: "Choose a class (Fighter, Wizard, Rogue, Cleric)."
+
+  utter_ask_weapon:
+    - text: "Choose a starting weapon (sword, bow, dagger, staff)."
+
+  utter_confirm_character:
+    - text: |
+        Here is your character:
+        - Name: {character_name}
+        - Race: {race}
+        - Subrace: {subrace}
+        - Class: {class}
+        - Weapon: {weapon}
+
+        Does everything look good?
+
+  utter_done:
+    - text: "Perfect! Your character has been created."
+
+forms:
+  character_creation_form:
+    required_slots:
+      character_name:
+      race:
+      subrace:
+      class:
+      weapon:
+
+actions:
+  - validate_character_creation_form
+  - action_ask_subrace
+  - action_submit_character
+  - give_help
 
 session_config:
   session_expiration_time: 60
