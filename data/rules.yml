@@ -1,13 +1,25 @@
 version: "2.0"
 
 rules:
+  - rule: Ask help Theme
+    steps:
+      - intent: ask_help_theme
+      - action: utter_explanation_theme
+  
+  - rule: Ask help Difficulty
+    steps:
+      - intent: ask_help_difficulty
+      - action: utter_explanation_difficulty
 
-- rule: Say goodbye anytime the user says goodbye
-  steps:
-  - intent: goodbye
-  - action: utter_goodbye
+  - rule: Modification language
+    steps:
+      - intent: ask_change_language
+      - action: utter_language_selection
+      - intent: language_selection
 
-- rule: Say 'I am a bot' anytime the user challenges
-  steps:
-  - intent: bot_challenge
-  - action: utter_iamabot
+      
+  - rule: Modification accessibility
+    steps:
+      - intent: ask_change_accessibility
+      - action: utter_accessibility_selection
+      - intent: accessibility_selection
