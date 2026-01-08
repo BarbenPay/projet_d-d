@@ -84,9 +84,50 @@ nlu:
     - so saad
     - so sad
 
-- intent: bot_challenge
+- intent: race
   examples: |
-    - are you a bot?
-    - are you a human?
-    - am I talking to a bot?
-    - am I talking to a human?
+    - elf
+    - dwarf
+    - human
+    - drow
+    - tiefling
+    - gnome
+    - dragonborn
+
+- intent: weapon
+  examples: |
+    - sword
+    - longsword
+    - bow
+    - axe
+    - mace
+    - staff
+    - dagger
+    - hammer
+    - shield
+    - orb
+    - luth
+
+- intent: class
+  examples: |
+    - paladin
+    - rogue
+    - wizard
+    - druid
+    - monk
+    - barbarian
+    - bard
+    - ranger
+    - sorcerer
+
+- intent: input_choose_class
+  examples: |
+    - I want to be a [wizard](class)
+    - I select the [rogue](class) class
+    - [paladin](class)
+    - make me a [barbarian](class)
+    - I will play a [ranger](class)
+    - [monk](class) please
+    - I prefer [sorcerer](class)
+    - [druid](class)
+    - [bard](class)
