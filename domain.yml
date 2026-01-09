@@ -1,25 +1,24 @@
 version: "2.0"
 
 intents:
-  - greet
+  - user_choose_race
+  - user_choose_subrace
+  - user_choose_class
+  - user_choose_weapon
+  - user_choose_attribute
   - affirm
   - deny
-  - inform
-  - request_help
-  - start_character_creation
+  - user_ask_help
+  - user_choose_reset
 
 entities:
-  - character_name
   - race
   - subrace
-  - class
   - weapon
+  - class
+  - attribute
 
 slots:
-  character_name:
-    type: text
-    influence_conversation: true
-
   race:
     type: text
     influence_conversation: true
@@ -36,36 +35,40 @@ slots:
     type: text
     influence_conversation: true
 
+  attribute:
+    type: text
+    influence_conversation: true
+
 responses:
   utter_greet:
     - text: "Hello adventurer! Ready to create your character?"
 
-  utter_help:
-    - text: "I can help you create a D&D character: name, race, class, weapon, and more."
+  utter_language_selection: 
+    - text: "Which language would you like to use?"
+
+  utter_accessibility_selection:
+    - text: "How would you like to play the game: text-based or voice-based?"
 
   utter_start_character_creation:
     - text: "Great! Let's start creating your character."
 
-  utter_ask_character_name:
-    - text: "What is your character's name?"
-
   utter_ask_race:
-    - text: "Choose a race (Human, Elf, Dwarf, Halfling)."
+    - text: "Choose a race (elf, dwarf, human, drow, gnome, dragonborn)."
 
   utter_ask_class:
-    - text: "Choose a class (Fighter, Wizard, Rogue, Cleric)."
+    - text: "Choose a class (paladin, rogue, wizard, druid, monk, barbarian, bard, ranger, sorcerer)."
 
-  utter_ask_weapon:
-    - text: "Choose a starting weapon (sword, bow, dagger, staff)."
+  utter_ask_attribute:
+    - text: ""
 
   utter_confirm_character:
     - text: |
         Here is your character:
-        - Name: {character_name}
         - Race: {race}
         - Subrace: {subrace}
         - Class: {class}
         - Weapon: {weapon}
+        - Attribute {attribute}
 
         Does everything look good?
 
@@ -73,17 +76,29 @@ responses:
     - text: "Perfect! Your character has been created."
 
 forms:
-  character_creation_form:
+  game_config:
     required_slots:
-      character_name:
+      language:
+      accessibility:
+
+  storie_config:
+    required_slots:
+      theme:
+      difficulty:
+      nb_players:
+
+  character:
+    required_slots:
       race:
       subrace:
       class:
       weapon:
+      attribute:
+
 
 actions:
-  - validate_character_creation_form
-  - action_ask_subrace
+  - utter_ask_subrace
+  - utter_ask_weapon
   - action_submit_character
   - give_help
 
