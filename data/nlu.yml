@@ -60,6 +60,30 @@ nlu:
     - ranger
     - sorcerer
 
+- lookup: attribute
+  examples: |
+    - strength
+    - dexterity
+    - constitution
+    - intelligence
+    - wisdom
+    - charisma
+    - power
+    - agility
+    - stamina
+    - magic
+
+- intent: user_choose_race
+  examples: |
+    - I want to be an [elf](race)
+    - I choose [dwarf](race)
+    - [human](race)
+    - make me a [drow](race)
+    - [tiefling](race)
+    - [gnome](race)
+    - [dragonborn](race)
+    - I am a [halfling](race)
+
 - intent: user_choose_subrace
   examples: |
     # --- Elfes ---
@@ -84,17 +108,6 @@ nlu:
     - [metallic](subrace) ancestry
     - [gem](subrace) dragonborn
     - [draconblood](subrace)
-
-- intent: user_choose_race
-  examples: |
-    - I want to be an [elf](race)
-    - I choose [dwarf](race)
-    - [human](race)
-    - make me a [drow](race)
-    - [tiefling](race)
-    - [gnome](race)
-    - [dragonborn](race)
-    - I am a [halfling](race)
 
 - intent: user_choose_class
   examples: |
@@ -120,30 +133,17 @@ nlu:
     - [hammer](weapon)
     - [shield](weapon)
 
-- intent: user_choose_subrace
+- intent: user_choose_attribute
   examples: |
-    # --- Elfes ---
-    - I choose [high](subrace) elf
-    - I want to be a [wood](subrace) elf
-    - [high](subrace)
-    
-    # --- Nains ---
-    - [hill](subrace) dwarf
-    - I pick [mountain](subrace)
-    
-    # --- Gnomes ---
-    - [rock](subrace) gnome
-    - I am a [forest](subrace) gnome
-    - [deep](subrace)
-    
-    # --- Drows (Simplifiés) ---
-    - I want to be a [deep](subrace) drow
-    - I choose [surface](subrace)
-    
-    # --- Dragonborn ---
-    - [metallic](subrace) ancestry
-    - [gem](subrace) dragonborn
-    - [draconblood](subrace)
+    - I want to be [strong](attribute)
+    - prioritize [intelligence](attribute)
+    - my best stat is [charisma](attribute)
+    - put points in [dexterity](attribute)
+    - I have [15](number) in [wisdom](attribute)
+    - set [strength](attribute) to [18](number)
+    - [constitution](attribute)
+    - [agility](attribute)
+    - increase my [magic](attribute)
 
 - intent: affirm
   examples: |
@@ -191,15 +191,3 @@ nlu:
     - begin again
     - I want to start a new character
     - delete and restart
-
-- intent: user_choose_attribute
-  examples: |
-    - I want to be [strong](attribute)
-    - prioritize [intelligence](attribute)
-    - my best stat is [charisma](attribute)
-    - put points in [dexterity](attribute)
-    - I have [15](number) in [wisdom](attribute)
-    - set [strength](attribute) to [18](number)
-    - [constitution](attribute)
-    - [agility](attribute)
-    - increase my [magic](attribute)
