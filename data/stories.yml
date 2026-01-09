@@ -61,23 +61,56 @@ stories:
                       #   - checkpoint: wait_for_confirmation_settings_story
 
 - story: story settings
-steps:
-- 
+  steps:
+  - checkpoint: start_story_settings
+
+  - checkpoint: restart_theme
+  - action: utter_ask_theme
+  - intent: user_choose_theme
+
+  - checkpoint: restart_difficulty
+  - action: utter_ask_difficulty
+
+  - checkpoint: modification_theme
+  - intent: user_choose_difficulty
+
+  - checkpoint: restart_number_player
+  - action: utter_ask_number_player
+
+  - checkpoint: modification_difficulty
+  - intent: user_choose_number_player
+
+  - action: utter_confirm_story
+  - checkpoint: wait_for_confirmation_settings_story
+
 
 #######################################################################################
+
+- story: story settings theme change
+  steps:
+  - checkpoint: modification_theme
+  - intent: deny
+  - checkpoint: restart_theme
+
+- story: story settings difficulty change
+  steps:
+  - checkpoint: modification_difficulty
+  - intent: deny
+  - checkpoint: restart_difficulty
+
 
 - story: story settings confirmed
   steps:
   - checkpoint: wait_for_confirmation_settings_story
-  - intent: confirm_settings_story 
+  - intent: affirm
   - action: utter_start_creation_caracter
   - checkpoint: create_character
 
 - story: story settings denied
   steps:
   - checkpoint: wait_for_confirmation_settings_story
-  - intent: denied_settings_story 
-  - checkpoint: start_story_settings
+  - intent: deny
+  - checkpoint: restart_number_player
 
 #######################################################################################
 
@@ -108,27 +141,71 @@ steps:
   steps:
   - checkpoint: create_character
 
+  - checkpoint: restart_race
   # Choisir une race
   - action: utter_ask_race
   # Race choisit
   - intent: user_choose_race
 
+
+  - checkpoint: restart_subrace
   # Choisir une sous race (normalement en fonction de la race)
   - action: utter_ask_subrace
+
+  - checkpoint: user_change_race
   # Sous race choisit
   - intent: user_choose_subrace
 
+
+  - checkpoint: restart_class
   # Choisir une classe
   - action: utter_ask_class
+
+  - checkpoint: user_change_subrace
   # Classe choisit
   - intent: user_choose_class
 
+
+  - checkpoint: restart_weapon
   # Choisir une arme (normalement en fonction de la classe)
   - action: utter_ask_weapon
+
+  - checkpoint: user_change_class
   # Arme choisit
   - intent: user_choose_weapon
 
+
   # Le MJ va récapituler les personnalisations du personnage
   - action: utter_confirm_character
+
+#######################################################################################
+
+- story: character creation change race
+  steps:
+  - checkpoint: user_change_race
+  - intent: deny
+  - checkpoint: restart_race
+
+- story: character creation change subrace
+  steps:
+  - checkpoint: user_change_subrace
+  - intent: deny
+  - checkpoint: restart_subrace
+
+- story: character creation change class
+  steps:
+  - checkpoint: user_change_class
+  - intent: deny
+  - checkpoint: restart_class
+
+
+
+
+
+
+
+
+
+
 
 
