@@ -22,13 +22,12 @@ stories:
 
 #######################################################################################
 
-
 - story: path setup confirmed
   steps:
   - checkpoint: wait_for_confirmation_settings_game
   - intent: confirm_settings_game
   - action: utter_start_story_settings
-  #Annonce du commencement de la création de personnage
+  #Annonce du commencement de la création de l'histoire
   - checkpoint: start_story_settings
   #Va directement sur les paramètres de l'histoire
 
@@ -41,26 +40,29 @@ stories:
 
 #######################################################################################
 
-
 #######################################################################################
 
+                      # - story: story settings
+                      #   steps:
+                      #   - checkpoint: start_story_settings
+
+                      #   # On active le formulaire
+                      #   - action: game_settings_form
+                      #   - active_loop: game_settings_form
+                      #     #Ici on a la création d'une loop. Tant que l'utilisateur n'a pas rempli les 3 variables (story_theme, story_difficulty, story_players)
+                      #     #Donc une création de slot pour stocker les variables. Le bot demande le theme mais comme il est dans la loop la réponse de la difficulty
+                      #     #ne fera pas planter le code. Il remplira la variable en le précisant au joueur et redemandera le theme si il n'a pas été donné. 
+                      #   - active_loop: null
+                      #   - slot_was_set:
+                      #     - requested_slot: null
+
+                      #   # Une fois sorti de la boucle, on confirme
+                      #   - action: utter_confirm_settings_story
+                      #   - checkpoint: wait_for_confirmation_settings_story
+
 - story: story settings
-  steps:
-  - checkpoint: start_story_settings
-
-  # On active le formulaire
-  - action: game_settings_form
-  - active_loop: game_settings_form
-    #Ici on a la création d'une loop. Tant que l'utilisateur n'a pas rempli les 3 variables (story_theme, story_difficulty, story_players)
-    #Donc une création de slot pour stocker les variables. Le bot demande le theme mais comme il est dans la loop la réponse de la difficulty
-    #ne fera pas planter le code. Il remplira la variable en le précisant au joueur et redemandera le theme si il n'a pas été donné. 
-  - active_loop: null
-  - slot_was_set:
-    - requested_slot: null
-
-  # Une fois sorti de la boucle, on confirme
-  - action: utter_confirm_settings_story
-  - checkpoint: wait_for_confirmation_settings_story
+steps:
+- 
 
 #######################################################################################
 
@@ -69,7 +71,7 @@ stories:
   - checkpoint: wait_for_confirmation_settings_story
   - intent: confirm_settings_story 
   - action: utter_start_creation_caracter
-  - checkpoint: create_caracter
+  - checkpoint: create_character
 
 - story: story settings denied
   steps:
@@ -79,25 +81,54 @@ stories:
 
 #######################################################################################
 
-
 #######################################################################################
+
+                    # - story: character creation
+                    #   steps:
+                    #   - checkpoint: create_character
+                      
+                    #   # Ici on lance le formulaire via une action.py qui va demander Race puis la sous race en fonction de la race. De même pour 
+                    #   # classe/arme et les attributs
+                    #   - action: caracter_creation_form
+                    #   - active_loop: caracter_creation_form
+                    #   - active_loop: null
+                    #   - slot_was_set:
+                    #     - requested_slot: null
+                      
+                    #   - action: action_submit_character
+                      
+                    #   # On capte que le code python est fini et on passe au suivant.
+                    #   - slot_was_set:
+                    #     - is_creation_finished: true
+                        
+                    #   - action: utter_all_characters_ready
+                    #   - action: utter_start_adventure
 
 - story: character creation
   steps:
-  - checkpoint: creat_caracter
-  
-  #Ici on va rentrer dans la boucle pour faire la création de personnage, dans la meme idée que la story.
-  - action: character_creation_form
-  - active_loop: character_creation_form
-  - active_loop: null
-  - slot_was_set:
-    - requested_slot: null
-  
-  #Le formulaire du personnage est fini on appelle le submit character pour enregistrer les slots, les vider et repartir de character_creation_form 
-  - action: action_submit_character
-  
-  - slot_was_set:
-    - is_creation_finished: true
-    
-  - action: utter_all_characters_ready
-  - action: utter_start_adventure
+  - checkpoint: create_character
+
+  # Choisir une race
+  - action: utter_ask_race
+  # Race choisit
+  - intent: user_choose_race
+
+  # Choisir une sous race (normalement en fonction de la race)
+  - action: utter_ask_subrace
+  # Sous race choisit
+  - intent: user_choose_subrace
+
+  # Choisir une classe
+  - action: utter_ask_class
+  # Classe choisit
+  - intent: user_choose_class
+
+  # Choisir une arme (normalement en fonction de la classe)
+  - action: utter_ask_weapon
+  # Arme choisit
+  - intent: user_choose_weapon
+
+  # Le MJ va récapituler les personnalisations du personnage
+  - action: utter_confirm_character
+
+
