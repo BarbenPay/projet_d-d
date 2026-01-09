@@ -62,18 +62,24 @@ stories:
 
 - story: story settings
   steps:
+  #On arrive ici quand les paramètres du jeu ont été finalisés.
   - checkpoint: start_story_settings
 
+  #Le checkpoint permet de repere lors d'un retour en arrière. Par exemple depuis la difficulé si on veut revenir en arrière on a alors ce flag.
   - checkpoint: restart_theme
+  #Demande du theme de l'histoire.
   - action: utter_ask_theme
   - intent: user_choose_theme
+
 
   - checkpoint: restart_difficulty
   - action: utter_ask_difficulty
 
+  #Ce flag nous permet d'accéder à la story, si l'utilisateur n'est pas content de son choix. Il revient alors en arrière : Choix Du Theme
   - checkpoint: modification_theme
   - intent: user_choose_difficulty
 
+  #Flag pour revenir si l'utilisateur n'est pas content du récap général
   - checkpoint: restart_number_player
   - action: utter_ask_number_player
 
@@ -82,7 +88,6 @@ stories:
 
   - action: utter_confirm_story
   - checkpoint: wait_for_confirmation_settings_story
-
 
 #######################################################################################
 
