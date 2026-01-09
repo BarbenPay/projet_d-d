@@ -128,5 +128,7 @@ steps:
   # Arme choisit
   - intent: user_choose_weapon
 
-  
+  # Le MJ va récapituler les personnalisations du personnage
+  - action: utter_confirm_character
+
 
