@@ -90,10 +90,10 @@ responses:
   utter_ask_difficulty:
     - text: "Choose a difficulty (easy, normal, hard)."
 
-  utter_ask_nb_players:
+  utter_ask_number_player:
     - text: "How many players will join the game?"
 
-  utter_confirm_settings_story:
+  utter_confirm_story:
     - text: |
         Here is your storie configuration:
         - Theme : {theme}
@@ -127,6 +127,5 @@ actions:
   - utter_ask_subrace
   - utter_ask_weapon
   - utter_ask_attribute
-  - action_submit_character
   - utter_give_help
 
