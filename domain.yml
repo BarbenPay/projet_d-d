@@ -1,43 +1,70 @@
 version: "2.0"
+config:
+  store_entities_as_slots: true
+session_config:
+  session_expiration_time: 60
+  carry_over_slots_to_new_session: true
+
 
 intents:
+  - affirm
+  - deny
+  - user_ask_help
+  - user_choose_reset
   - user_choose_race
   - user_choose_subrace
   - user_choose_class
   - user_choose_weapon
   - user_choose_attribute
-  - affirm
-  - deny
-  - user_ask_help
-  - user_choose_reset
+
 
 entities:
+  - language
+  - accessibility
+  - theme
+  - difficulty
+  - nb_players
   - race
   - subrace
   - weapon
   - class
   - attribute
 
+
 slots:
+  language:
+    type: text
+    influence_conversation: true
+  accessibility:
+    type: text
+    influence_conversation: true
+
+  theme:
+    type: text
+    influence_conversation: true
+  difficulty:
+    type: text
+    influence_conversation: true
+  nb_players:
+    type: text
+    influence_conversation: true
+
   race:
     type: text
     influence_conversation: true
-
   subrace:
     type: text
     influence_conversation: true
-
   class:
     type: text
     influence_conversation: true
-
   weapon:
     type: text
     influence_conversation: true
-
   attribute:
     type: text
     influence_conversation: true
+
 
 responses:
   utter_greet:
@@ -49,6 +76,32 @@ responses:
   utter_accessibility_selection:
     - text: "How would you like to play the game: text-based or voice-based?"
 
+  utter_confirm_settings_game:
+    - text: |
+        Here is your game configuration:
+        - Language : {language}
+        - Accessibility : {accessibility}
+
+        Does everything look good?
+  
+  utter_ask_theme:
+    - text: "What theme do you want for the adventure (dark fantasy, high fantasy, steampunk...)?"
+
+  utter_ask_difficulty:
+    - text: "Choose a difficulty (easy, normal, hard)."
+
+  utter_ask_nb_players:
+    - text: "How many players will join the game?"
+
+  utter_confirm_settings_story:
+    - text: |
+        Here is your storie configuration:
+        - Theme : {theme}
+        - Difficulty : {difficulty}
+        - Number of players : {nb_players}
+
+        Does everything look good?
+
   utter_start_character_creation:
     - text: "Great! Let's start creating your character."
 
@@ -57,9 +110,6 @@ responses:
 
   utter_ask_class:
     - text: "Choose a class (paladin, rogue, wizard, druid, monk, barbarian, bard, ranger, sorcerer)."
-
-  utter_ask_attribute:
-    - text: ""
 
   utter_confirm_character:
     - text: |
@@ -72,36 +122,11 @@ responses:
 
         Does everything look good?
 
-  utter_done:
-    - text: "Perfect! Your character has been created."
-
-forms:
-  game_config:
-    required_slots:
-      language:
-      accessibility:
-
-  storie_config:
-    required_slots:
-      theme:
-      difficulty:
-      nb_players:
-
-  character:
-    required_slots:
-      race:
-      subrace:
-      class:
-      weapon:
-      attribute:
-
 
 actions:
   - utter_ask_subrace
   - utter_ask_weapon
+  - utter_ask_attribute
   - action_submit_character
-  - give_help
+  - utter_give_help
 
-session_config:
-  session_expiration_time: 60
-  carry_over_slots_to_new_session: true
