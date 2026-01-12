@@ -89,6 +89,9 @@ responses:
         - Accessibility : {accessibility}
 
         Does everything look good?
+
+  utter_start_story_settings:
+    - text: "Great! Let's start choosing your story settings."
   
   utter_ask_theme:
     - text: "What theme do you want for the adventure (dark fantasy, high fantasy, steampunk...)?"
@@ -108,7 +111,7 @@ responses:
 
         Does everything look good?
 
-  utter_start_character_creation:
+  utter_start_creation_character:
     - text: "Great! Let's start creating your character."
 
   utter_ask_race:

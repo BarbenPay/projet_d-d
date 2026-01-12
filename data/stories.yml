@@ -108,7 +108,7 @@ stories:
   steps:
   - checkpoint: wait_for_confirmation_settings_story
   - intent: affirm
-  - action: utter_start_creation_caracter
+  - action: utter_start_creation_character
   - checkpoint: create_character
 
 - story: story settings denied
