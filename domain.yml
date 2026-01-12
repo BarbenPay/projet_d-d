@@ -35,8 +35,6 @@ intents:
     use_entities: true
 - user_choose_attribute:
     use_entities: true
-- greet:
-    use_entities: true
 entities:
 - language
 - accessibility

@@ -1,2 +1,43 @@
+# --- Archives et Modèles ---
 *.tar.gz
 *.tar
+models/*
+# Si tu veux quand même garder un fichier .gitkeep pour que le dossier existe
+!models/.gitkeep
+
+# --- Python ---
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+env/
+venv/
+.venv/
+
+# --- Rasa (Bases de données et Logs) ---
+*.db
+*.log
+rasa.db
+events.db
+
+# --- Rasa (Résultats et graphiques) ---
+results/
+story_graph.dot
+.rasa/
+
+# --- IDE et Système ---
+.vscode/
+.idea/
+.DS_Store
+.config/
+
+# --- Librairies ---
+.keras/
+.tensorflow/
+
+# --- SÉCURITÉ (Très important) ---
+.env
+credentials.yml
+# (Note : ne décommente credentials.yml que si tu as des mots de passe réels dedans. 
+# Si c'est le fichier par défaut vide, tu peux le laisser sur git)
