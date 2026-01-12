@@ -16,7 +16,7 @@ venv/
 .venv/
 
 # --- Rasa (Bases de données et Logs) ---
-*.db
+*.db*
 *.log
 rasa.db
 events.db
