@@ -4,7 +4,7 @@ stories:
 
 - story: welcome path
   steps:
-  - intent: start_game
+  - intent: greet
   #Déclenchement du jeu
   - checkpoint: check_setup_loop_start
   #Ici l'utilisateur va revenir sur le choix de la langue si il est pas d'accord avec les settings à partir de la story : path setup denied
