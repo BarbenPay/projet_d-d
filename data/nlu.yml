@@ -73,6 +73,44 @@ nlu:
     - stamina
     - magic
 
+- lookup: language
+  examples: |
+    - english
+    - french
+    - francais
+    - spanish
+    - german
+
+- lookup: accessibility
+  examples: |
+    - audio
+    - text
+    - voice only
+    - text only
+    - blind
+    - deaf
+
+- lookup: theme
+  examples: |
+    - fantasy
+    - dark fantasy
+    - horror
+    - comedy
+    - epic
+    - investigation
+    - mystery
+    - dungeon crawler
+    - cyberpunk
+
+- lookup: difficulty
+  examples: |
+    - easy
+    - normal
+    - hard
+    - expert
+    - nightmare
+    - beginner
+
 - intent: user_choose_race
   examples: |
     - I want to be an [elf](race)
@@ -152,6 +190,14 @@ nlu:
     - that sounds good
     - correct
     - sure
+    - confirm settings
+    - I accept this difficulty
+    - that fits me
+    - the parameters are good
+    - validate choices
+    - yes let's play with this
+    - sounds perfect for the theme
+    - confirm language
 
 - intent: deny
   examples: |
@@ -163,6 +209,13 @@ nlu:
     - no way
     - not really
     - stop
+    - wrong settings
+    - I refuse this theme
+    - incorrect parameters
+    - no change the difficulty
+    - I want to change options
+    - these are not the right settings
+    - reject
 
 - intent: user_ask_help
   examples: |
@@ -189,3 +242,64 @@ nlu:
     - begin again
     - I want to start a new character
     - delete and restart
+
+- intent: start_game
+  examples: |
+    - start game
+    - let's play
+    - launch the adventure
+    - begin game
+    - start
+    - I am ready to start
+    - let's go
+    - open the game
+
+- intent: language_selection
+  examples: |
+    - I speak [english](language)
+    - [french](language) please
+    - switch to [spanish](language)
+    - [francais](language)
+    - I want to play in [english](language)
+    - set language to [german](language)
+
+- intent: accessibility_selection
+  examples: |
+    - enable [audio](accessibility) mode
+    - I prefer [text only](accessibility)
+    - activate [screen reader](accessibility) support
+    - I am [blind](accessibility)
+    - [voice only](accessibility)
+    - set accessibility to [high contrast](accessibility)
+    - [simplified](accessibility) mode please
+
+- intent: user_choose_theme
+  examples: |
+    - I want a [fantasy](theme) adventure
+    - let's play a [horror](theme) game
+    - [dark fantasy](theme)
+    - I prefer [comedy](theme)
+    - set theme to [mystery](theme)
+    - [epic](theme) style
+    - [investigation](theme)
+
+- intent: user_choose_difficulty
+  examples: |
+    - [easy](difficulty) mode
+    - I want to play in [hard](difficulty)
+    - [story](difficulty) mode please
+    - set difficulty to [nightmare](difficulty)
+    - [normal](difficulty)
+    - I am a [beginner](difficulty)
+    - [expert](difficulty) challenge
+
+- intent: user_choose_number_player
+  examples: |
+    - [1](number) player
+    - just [one](number)
+    - we are [2](number)
+    - [3](number) players
+    - [4](number) people
+    - set players to [5](number)
+    - solo game
+    - [single](number) player
