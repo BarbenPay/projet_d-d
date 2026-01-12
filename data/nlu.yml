@@ -119,46 +119,89 @@ nlu:
     - make me a [drow](race)
     - [gnome](race)
     - [dragonborn](race)
+    - I pick [gnome](race)
+    - select [elf](race)
+    - play as a [dragonborn](race)
+    - my race is [human](race)
+    - create a [dwarf](race) character
+    - [drow](race) please
+    - I'll go with [gnome](race)
+    - [elf](race) is my choice
+    - definitely [human](race)
+    - let's be a wizard (race)
 
 - intent: user_choose_subrace
   examples: |
     # --- Elfes ---
     - I choose [high](subrace) elf
     - I want to be a [wood](subrace) elf
-    - [high](subrace)
-    
+    - just [high](subrace)
+    - [wood](subrace) ancestry
+    - I am a [high](subrace) elf
+    - pick [wood](subrace)
+
     # --- Nains ---
     - [hill](subrace) dwarf
     - I pick [mountain](subrace)
-    
+    - [mountain](subrace) dwarf
+    - I come from the [hill](subrace)s
+    - [hill](subrace)
+
     # --- Gnomes ---
     - [rock](subrace) gnome
     - I am a [forest](subrace) gnome
-    - [deep](subrace)
-    
+    - [deep](subrace) gnome
+    - [rock](subrace)
+    - [forest](subrace)
+    - [cave](subrace)
+
     # --- Drows (Simplifiés) ---
     - I want to be a [deep](subrace) drow
     - I choose [surface](subrace)
-    
+    - [surface](subrace) drow
+    - [deep](subrace) one
+
     # --- Dragonborn ---
     - [metallic](subrace) ancestry
     - [gem](subrace) dragonborn
     - [draconblood](subrace)
+    - I have [metallic](subrace) scales
+    - [gem](subrace) type
+    - [draconblood](subrace) variant
 
 - intent: user_choose_class
   examples: |
+    # Mots seuls
+    - [wizard](class)
+    - [rogue](class)
+    - [paladin](class)
+    
+    # Phrases de choix
     - I want to be a [wizard](class)
     - I select the [rogue](class) class
-    - [paladin](class)
     - make me a [barbarian](class)
     - I will play a [ranger](class)
     - [monk](class) please
     - I prefer [sorcerer](class)
-    - [druid](class)
-    - [bard](class)
+    - [druid](class) is my choice
+    - I choose to be a [bard](class)
+    
+    # Contextes variés
+    - my class is [paladin](class)
+    - create a [monk](class)
+    - let's go with [barbarian](class)
+    - set class to [ranger](class)
+    - I am a [sorcerer](class)
+    - the [druid](class) class
 
 - intent: user_choose_weapon
   examples: |
+    # Mots seuls
+    - [sword](weapon)
+    - [bow](weapon)
+    - [staff](weapon)
+    
+    # Phrases d'équipement
     - I equip my [sword](weapon)
     - [longsword](weapon)
     - I take the [bow](weapon)
@@ -168,19 +211,40 @@ nlu:
     - [dagger](weapon)
     - [hammer](weapon)
     - [shield](weapon)
+    
+    # Verbes d'action
+    - I wield a [longsword](weapon)
+    - give me the [orb](weapon)
+    - I fight with a [mace](weapon)
+    - I choose the [luth](weapon)
+    - my weapon is a [dagger](weapon)
+    - I want the [axe](weapon)
+    - equip [shield](weapon)
+    - use [hammer](weapon)
 
 - intent: user_choose_attribute
   examples: |
+    # Choix simple de l'attribut (Focus)
     - I want to be [strong](attribute)
     - prioritize [intelligence](attribute)
     - my best stat is [charisma](attribute)
     - put points in [dexterity](attribute)
+    - focus on [wisdom](attribute)
+    - [constitution](attribute) is important
+    - I choose [agility](attribute)
+    - increase my [magic](attribute)
+    
+    # Attribution de points (Avec Regex Number)
     - I have [15](number) in [wisdom](attribute)
     - set [strength](attribute) to [18](number)
-    - [constitution](attribute)
-    - [agility](attribute)
-    - increase my [magic](attribute)
-
+    - [dexterity](attribute) [14](number)
+    - put [10](number) in [constitution](attribute)
+    - my [intelligence](attribute) is [16](number)
+    - [charisma](attribute) equals [8](number)
+    - assign [12](number) to [power](attribute)
+    - [agility](attribute) should be [13](number)
+    - set [stamina](attribute) to [15](number)
+    
 - intent: affirm
   examples: |
     - yes
@@ -303,3 +367,26 @@ nlu:
     - set players to [5](number)
     - solo game
     - [single](number) player
+
+- synonym: 1
+  examples: |
+    - one
+    - solo
+    - single
+    - alone
+
+- synonym: 2
+  examples: |
+    - two
+    - couple
+    - duo
+
+- synonym: 3
+  examples: |
+    - three
+    - trio
+
+- synonym: 4
+  examples: |
+    - four
+    - squad
