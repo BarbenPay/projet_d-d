@@ -1,140 +1,155 @@
-version: "2.0"
+version: '2.0'
 config:
   store_entities_as_slots: true
 session_config:
   session_expiration_time: 60
   carry_over_slots_to_new_session: true
-
-
 intents:
-  - affirm
-  - deny
-  - user_ask_help
-  - user_choose_reset
-  - start_game
-  - language_selection
-  - accessibility_selection
-  - user_choose_theme
-  - user_choose_difficulty
-  - user_choose_number_player
-  - user_choose_race
-  - user_choose_subrace
-  - user_choose_class
-  - user_choose_weapon
-  - user_choose_attribute
-
-
+- affirm:
+    use_entities: true
+- deny:
+    use_entities: true
+- user_ask_help:
+    use_entities: true
+- user_choose_reset:
+    use_entities: true
+- start_game:
+    use_entities: true
+- language_selection:
+    use_entities: true
+- accessibility_selection:
+    use_entities: true
+- user_choose_theme:
+    use_entities: true
+- user_choose_difficulty:
+    use_entities: true
+- user_choose_number_player:
+    use_entities: true
+- user_choose_race:
+    use_entities: true
+- user_choose_subrace:
+    use_entities: true
+- user_choose_class:
+    use_entities: true
+- user_choose_weapon:
+    use_entities: true
+- user_choose_attribute:
+    use_entities: true
 entities:
-  - language
-  - accessibility
-  - theme
-  - difficulty
-  - nb_players
-  - race
-  - subrace
-  - weapon
-  - class
-  - attribute
-
-
+- language
+- accessibility
+- theme
+- difficulty
+- nb_players
+- race
+- subrace
+- weapon
+- class
+- attribute
+- number
 slots:
   language:
-    type: text
+    type: rasa.shared.core.slots.TextSlot
+    initial_value: null
+    auto_fill: true
     influence_conversation: true
   accessibility:
-    type: text
+    type: rasa.shared.core.slots.TextSlot
+    initial_value: null
+    auto_fill: true
     influence_conversation: true
-
   theme:
-    type: text
+    type: rasa.shared.core.slots.TextSlot
+    initial_value: null
+    auto_fill: true
     influence_conversation: true
   difficulty:
-    type: text
+    type: rasa.shared.core.slots.TextSlot
+    initial_value: null
+    auto_fill: true
     influence_conversation: true
   nb_players:
-    type: float
+    type: rasa.shared.core.slots.FloatSlot
+    initial_value: null
+    auto_fill: true
     influence_conversation: true
-
+    max_value: 1.0
+    min_value: 0.0
   race:
-    type: text
+    type: rasa.shared.core.slots.TextSlot
+    initial_value: null
+    auto_fill: true
     influence_conversation: true
   subrace:
-    type: text
+    type: rasa.shared.core.slots.TextSlot
+    initial_value: null
+    auto_fill: true
     influence_conversation: true
   class:
-    type: text
+    type: rasa.shared.core.slots.TextSlot
+    initial_value: null
+    auto_fill: true
     influence_conversation: true
   weapon:
-    type: text
+    type: rasa.shared.core.slots.TextSlot
+    initial_value: null
+    auto_fill: true
     influence_conversation: true
   attribute:
-    type: text
+    type: rasa.shared.core.slots.TextSlot
+    initial_value: null
+    auto_fill: true
     influence_conversation: true
-
-
 responses:
   utter_greet:
-    - text: "Hello adventurer! Ready to create your character?"
-
-  utter_language_selection: 
-    - text: "Which language would you like to use?"
-
+  - text: Hello adventurer! Ready to create your character?
+  utter_language_selection:
+  - text: Which language would you like to use?
   utter_accessibility_selection:
-    - text: "How would you like to play the game: text-based or voice-based?"
-
+  - text: 'How would you like to play the game: text-based or voice-based?'
   utter_confirm_settings_game:
-    - text: |
-        Here is your game configuration:
-        - Language : {language}
-        - Accessibility : {accessibility}
+  - text: |
+      Here is your game configuration:
+      - Language : {language}
+      - Accessibility : {accessibility}
 
-        Does everything look good?
-
+      Does everything look good?
   utter_start_story_settings:
-    - text: "Great! Let's start choosing your story settings."
-  
+  - text: Great! Let's start choosing your story settings.
   utter_ask_theme:
-    - text: "What theme do you want for the adventure (dark fantasy, high fantasy, steampunk...)?"
-
+  - text: What theme do you want for the adventure (dark fantasy, high fantasy, steampunk...)?
   utter_ask_difficulty:
-    - text: "Choose a difficulty (easy, normal, hard)."
-
+  - text: Choose a difficulty (easy, normal, hard).
   utter_ask_number_player:
-    - text: "How many players will join the game?"
-
+  - text: How many players will join the game?
   utter_confirm_story:
-    - text: |
-        Here is your storie configuration:
-        - Theme : {theme}
-        - Difficulty : {difficulty}
-        - Number of players : {nb_players}
+  - text: |
+      Here is your storie configuration:
+      - Theme : {theme}
+      - Difficulty : {difficulty}
+      - Number of players : {nb_players}
 
-        Does everything look good?
-
+      Does everything look good?
   utter_start_creation_character:
-    - text: "Great! Let's start creating your character."
-
+  - text: Great! Let's start creating your character.
   utter_ask_race:
-    - text: "Choose a race (elf, dwarf, human, drow, gnome, dragonborn)."
-
+  - text: Choose a race (elf, dwarf, human, drow, gnome, dragonborn).
   utter_ask_class:
-    - text: "Choose a class (paladin, rogue, wizard, druid, monk, barbarian, bard, ranger, sorcerer)."
-
+  - text: Choose a class (paladin, rogue, wizard, druid, monk, barbarian, bard, ranger, sorcerer).
   utter_confirm_character:
-    - text: |
-        Here is your character:
-        - Race: {race}
-        - Subrace: {subrace}
-        - Class: {class}
-        - Weapon: {weapon}
-        - Attribute {attribute}
+  - text: |
+      Here is your character:
+      - Race: {race}
+      - Subrace: {subrace}
+      - Class: {class}
+      - Weapon: {weapon}
+      - Attribute {attribute}
 
-        Does everything look good?
-
-
+      Does everything look good?
 actions:
-  - utter_ask_subrace
-  - utter_ask_weapon
-  - utter_ask_attribute
-  - utter_give_help
-
+- utter_ask_subrace
+- utter_ask_weapon
+- utter_ask_attribute
+- utter_give_help
+forms: {}
+e2e_actions: []
