@@ -11,6 +11,12 @@ intents:
   - deny
   - user_ask_help
   - user_choose_reset
+  - start_game
+  - language_selection
+  - accessibility_selection
+  - user_choose_theme
+  - user_choose_difficulty
+  - user_choose_number_player
   - user_choose_race
   - user_choose_subrace
   - user_choose_class
@@ -46,7 +52,7 @@ slots:
     type: text
     influence_conversation: true
   nb_players:
-    type: text
+    type: float
     influence_conversation: true
 
   race:
