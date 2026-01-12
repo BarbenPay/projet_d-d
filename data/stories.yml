@@ -2,82 +2,82 @@ version: "2.0"
 
 stories:
 
-- story: welcome path
-  steps:
-  - intent: start_game
-  #Déclenchement du jeu
-  - checkpoint: check_setup_loop_start
-  #Ici l'utilisateur va revenir sur le choix de la langue si il est pas d'accord avec les settings à partir de la story : path setup denied
-  - action: utter_language_selection
-  #Le MJ propose les langues
-  - intent: language_selection
-  #Selection du langage
-  - action: utter_accessibility_selection
-  #Le MJ propose comment le jeu va etre joué (écrit ou oral)
-  - intent: accessibility_selection
-  #Selection de accessibility
-  - action: utter_confirm_settings_game
-  #Recap des paramètres choisis
-  - checkpoint: wait_for_confirmation_settings_game
+# - story: welcome path
+#   steps:
+#   - intent: start_game
+#   #Déclenchement du jeu
+#   - checkpoint: check_setup_loop_start
+#   #Ici l'utilisateur va revenir sur le choix de la langue si il est pas d'accord avec les settings à partir de la story : path setup denied
+#   - action: utter_language_selection
+#   #Le MJ propose les langues
+#   - intent: language_selection
+#   #Selection du langage
+#   - action: utter_accessibility_selection
+#   #Le MJ propose comment le jeu va etre joué (écrit ou oral)
+#   - intent: accessibility_selection
+#   #Selection de accessibility
+#   - action: utter_confirm_settings_game
+#   #Recap des paramètres choisis
+#   - checkpoint: wait_for_confirmation_settings_game
 
-#######################################################################################
+# #######################################################################################
 
-- story: path setup confirmed
-  steps:
-  - checkpoint: wait_for_confirmation_settings_game
-  - intent: confirm_settings_game
-  - action: utter_start_story_settings
-  #Annonce du commencement de la création de l'histoire
-  - checkpoint: start_story_settings
-  #Va directement sur les paramètres de l'histoire
+# - story: path setup confirmed
+#   steps:
+#   - checkpoint: wait_for_confirmation_settings_game
+#   - intent: confirm_settings_game
+#   - action: utter_start_story_settings
+#   #Annonce du commencement de la création de l'histoire
+#   - checkpoint: start_story_settings
+#   #Va directement sur les paramètres de l'histoire
 
-- story: path setup denied
-  steps:
-  - checkpoint: wait_for_confirmation_settings_game
-  - intent: denied_settings_game
-  - checkpoint: check_setup_loop_start
-  #Recommence le welcome path
+# - story: path setup denied
+#   steps:
+#   - checkpoint: wait_for_confirmation_settings_game
+#   - intent: denied_settings_game
+#   - checkpoint: check_setup_loop_start
+#   #Recommence le welcome path
 
-#######################################################################################
+# #######################################################################################
 
-#######################################################################################
+# #######################################################################################
 
-                      # - story: story settings
-                      #   steps:
-                      #   - checkpoint: start_story_settings
+#                       # - story: story settings
+#                       #   steps:
+#                       #   - checkpoint: start_story_settings
 
-                      #   # On active le formulaire
-                      #   - action: game_settings_form
-                      #   - active_loop: game_settings_form
-                      #     #Ici on a la création d'une loop. Tant que l'utilisateur n'a pas rempli les 3 variables (story_theme, story_difficulty, story_players)
-                      #     #Donc une création de slot pour stocker les variables. Le bot demande le theme mais comme il est dans la loop la réponse de la difficulty
-                      #     #ne fera pas planter le code. Il remplira la variable en le précisant au joueur et redemandera le theme si il n'a pas été donné. 
-                      #   - active_loop: null
-                      #   - slot_was_set:
-                      #     - requested_slot: null
+#                       #   # On active le formulaire
+#                       #   - action: game_settings_form
+#                       #   - active_loop: game_settings_form
+#                       #     #Ici on a la création d'une loop. Tant que l'utilisateur n'a pas rempli les 3 variables (story_theme, story_difficulty, story_players)
+#                       #     #Donc une création de slot pour stocker les variables. Le bot demande le theme mais comme il est dans la loop la réponse de la difficulty
+#                       #     #ne fera pas planter le code. Il remplira la variable en le précisant au joueur et redemandera le theme si il n'a pas été donné. 
+#                       #   - active_loop: null
+#                       #   - slot_was_set:
+#                       #     - requested_slot: null
 
-                      #   # Une fois sorti de la boucle, on confirme
-                      #   - action: utter_confirm_settings_story
-                      #   - checkpoint: wait_for_confirmation_settings_story
+#                       #   # Une fois sorti de la boucle, on confirme
+#                       #   - action: utter_confirm_settings_story
+#                       #   - checkpoint: wait_for_confirmation_settings_story
 
-- story: story settings
-steps:
-- 
+# - story: story settings
+# steps:
+# - 
 
-#######################################################################################
+# #######################################################################################
 
-- story: story settings confirmed
-  steps:
-  - checkpoint: wait_for_confirmation_settings_story
-  - intent: confirm_settings_story 
-  - action: utter_start_creation_caracter
-  - checkpoint: create_character
+# - story: story settings confirmed
+#   steps:
+#   - checkpoint: wait_for_confirmation_settings_story
+#   - intent: confirm_settings_story 
+#   - action: utter_start_creation_caracter
+#   - checkpoint: create_character
 
-- story: story settings denied
-  steps:
-  - checkpoint: wait_for_confirmation_settings_story
-  - intent: denied_settings_story 
-  - checkpoint: start_story_settings
+# - story: story settings denied
+#   steps:
+#   - checkpoint: wait_for_confirmation_settings_story
+#   - intent: denied_settings_story 
+#   - checkpoint: start_story_settings
 
 #######################################################################################
 
@@ -106,7 +106,6 @@ steps:
 
 - story: character creation
   steps:
-  - checkpoint: create_character
 
   # Choisir une race
   - action: utter_ask_race
@@ -114,7 +113,7 @@ steps:
   - intent: user_choose_race
 
   # Choisir une sous race (normalement en fonction de la race)
-  - action: utter_ask_subrace
+  - action: action_ask_subrace
   # Sous race choisit
   - intent: user_choose_subrace
 
@@ -124,7 +123,7 @@ steps:
   - intent: user_choose_class
 
   # Choisir une arme (normalement en fonction de la classe)
-  - action: utter_ask_weapon
+  - action: action_ask_weapon
   # Arme choisit
   - intent: user_choose_weapon
 

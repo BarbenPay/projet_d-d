@@ -79,10 +79,8 @@ nlu:
     - I choose [dwarf](race)
     - [human](race)
     - make me a [drow](race)
-    - [tiefling](race)
     - [gnome](race)
     - [dragonborn](race)
-    - I am a [halfling](race)
 
 - intent: user_choose_subrace
   examples: |
@@ -191,3 +189,8 @@ nlu:
     - begin again
     - I want to start a new character
     - delete and restart
+
+- intent: greet
+  examples: |
+    - Hello
+    - Hey

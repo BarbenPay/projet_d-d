@@ -1,107 +1,128 @@
-version: "2.0"
-
-intents:
-  - user_choose_race
-  - user_choose_subrace
-  - user_choose_class
-  - user_choose_weapon
-  - user_choose_attribute
-  - affirm
-  - deny
-  - user_ask_help
-  - user_choose_reset
-
-entities:
-  - race
-  - subrace
-  - weapon
-  - class
-  - attribute
-
-slots:
-  race:
-    type: text
-    influence_conversation: true
-
-  subrace:
-    type: text
-    influence_conversation: true
-
-  class:
-    type: text
-    influence_conversation: true
-
-  weapon:
-    type: text
-    influence_conversation: true
-
-  attribute:
-    type: text
-    influence_conversation: true
-
-responses:
-  utter_greet:
-    - text: "Hello adventurer! Ready to create your character?"
-
-  utter_language_selection: 
-    - text: "Which language would you like to use?"
-
-  utter_accessibility_selection:
-    - text: "How would you like to play the game: text-based or voice-based?"
-
-  utter_start_character_creation:
-    - text: "Great! Let's start creating your character."
-
-  utter_ask_race:
-    - text: "Choose a race (elf, dwarf, human, drow, gnome, dragonborn)."
-
-  utter_ask_class:
-    - text: "Choose a class (paladin, rogue, wizard, druid, monk, barbarian, bard, ranger, sorcerer)."
-
-  utter_ask_attribute:
-    - text: ""
-
-  utter_confirm_character:
-    - text: |
-        Here is your character:
-        - Race: {race}
-        - Subrace: {subrace}
-        - Class: {class}
-        - Weapon: {weapon}
-        - Attribute {attribute}
-
-        Does everything look good?
-
-  utter_done:
-    - text: "Perfect! Your character has been created."
-
-forms:
-  game_config:
-    required_slots:
-      language:
-      accessibility:
-
-  storie_config:
-    required_slots:
-      theme:
-      difficulty:
-      nb_players:
-
-  character:
-    required_slots:
-      race:
-      subrace:
-      class:
-      weapon:
-      attribute:
-
-
-actions:
-  - utter_ask_subrace
-  - utter_ask_weapon
-  - action_submit_character
-  - give_help
-
+version: '2.0'
+config:
+  store_entities_as_slots: true
 session_config:
   session_expiration_time: 60
   carry_over_slots_to_new_session: true
+intents:
+- user_choose_race:
+    use_entities: true
+- user_choose_subrace:
+    use_entities: true
+- user_choose_class:
+    use_entities: true
+- user_choose_weapon:
+    use_entities: true
+- user_choose_attribute:
+    use_entities: true
+- affirm:
+    use_entities: true
+- deny:
+    use_entities: true
+- user_ask_help:
+    use_entities: true
+- user_choose_reset:
+    use_entities: true
+- language_selection:
+    use_entities: true
+- ask_change_language:
+    use_entities: true
+- ask_help_difficulty:
+    use_entities: true
+- denied_settings_game:
+    use_entities: true
+- start_game:
+    use_entities: true
+- accessibility_selection:
+    use_entities: true
+- ask_help_theme:
+    use_entities: true
+- ask_change_accessibility:
+    use_entities: true
+- confirm_settings_game:
+    use_entities: true
+- greet:
+    use_entities: true
+entities:
+- race
+- subrace
+- weapon
+- class
+- attribute
+- number
+slots:
+  race:
+    type: rasa.shared.core.slots.TextSlot
+    initial_value: null
+    auto_fill: true
+    influence_conversation: true
+  subrace:
+    type: rasa.shared.core.slots.TextSlot
+    initial_value: null
+    auto_fill: true
+    influence_conversation: true
+  class:
+    type: rasa.shared.core.slots.TextSlot
+    initial_value: null
+    auto_fill: true
+    influence_conversation: true
+  weapon:
+    type: rasa.shared.core.slots.TextSlot
+    initial_value: null
+    auto_fill: true
+    influence_conversation: true
+  attribute:
+    type: rasa.shared.core.slots.TextSlot
+    initial_value: null
+    auto_fill: true
+    influence_conversation: true
+responses:
+  utter_greet:
+  - text: Hello adventurer! Ready to create your character?
+  utter_language_selection:
+  - text: Which language would you like to use?
+  utter_accessibility_selection:
+  - text: 'How would you like to play the game: text-based or voice-based?'
+  utter_start_character_creation:
+  - text: Great! Let's start creating your character.
+  utter_ask_race:
+  - text: Choose a race (elf, dwarf, human, drow, gnome, dragonborn).
+  utter_ask_class:
+  - text: Choose a class (paladin, rogue, wizard, druid, monk, barbarian, bard, ranger, sorcerer).
+  utter_ask_attribute:
+  - text: What represents your character best? (Strength, Intelligence, Charisma...)
+  utter_confirm_character:
+  - text: |
+      Here is your character:
+      - Race: {race}
+      - Subrace: {subrace}
+      - Class: {class}
+      - Weapon: {weapon}
+      - Attribute {attribute}
+
+      Does everything look good?
+  utter_done:
+  - text: Perfect! Your character has been created.
+actions:
+- action_ask_subrace
+- action_ask_weapon
+- action_check_weapon
+forms:
+  character:
+    required_slots:
+      attribute:
+      - entity: attribute
+        type: from_entity
+      class:
+      - entity: class
+        type: from_entity
+      race:
+      - entity: race
+        type: from_entity
+      subrace:
+      - entity: subrace
+        type: from_entity
+      weapon:
+      - entity: weapon
+        type: from_entity
+e2e_actions: []

@@ -1,25 +1,9 @@
 version: "2.0"
 
+
 rules:
-  - rule: Ask help Theme
+  - rule: Dire bonjour au démarrage de la session
+    conversation_start: true  # <--- Indique que cela ne s'applique qu'au tout début
     steps:
-      - intent: ask_help_theme
-      - action: utter_explanation_theme
-  
-  - rule: Ask help Difficulty
-    steps:
-      - intent: ask_help_difficulty
-      - action: utter_explanation_difficulty
-
-  - rule: Modification language
-    steps:
-      - intent: ask_change_language
-      - action: utter_language_selection
-      - intent: language_selection
-
-      
-  - rule: Modification accessibility
-    steps:
-      - intent: ask_change_accessibility
-      - action: utter_accessibility_selection
-      - intent: accessibility_selection
+      - intent: greet
+      - action: utter_ask_race

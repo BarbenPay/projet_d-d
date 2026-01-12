@@ -9,6 +9,7 @@
 
 from typing import Any, Text, Dict, List
 from rasa_sdk import Action, Tracker
+from rasa_sdk.events import SlotSet
 from rasa_sdk.executor import CollectingDispatcher
 
 dictWeaponPossibilityDependingClass = {
@@ -29,9 +30,28 @@ dictWeaponPossibilityDependingClass = {
 dictSubraceDependingRace = {
     "elf" : ["high", "wood"],
     "dwarf" : ["hill", "mountain"],
-    "gnome" : ["rock", "forest", "deep"],
-    "drakeide" : ["steel", "gem", "dragonblood"],
+    "gnome" : ["rock", "forest", "cave"],
+    "dragonborn" : ["metallic", "gem", "dragonblood"],
     "drow" : ["deep", "surface"]
+}
+
+dictNaturalAbilityFromSubrace = {
+    "high": "Keen Mind: You know a handy little magic trick (light or small spark).",
+    "wood": "Fleet of Foot: You can move through the forest without making a sound.",
+    
+    "hill": "Dwarven Toughness: You are hardier and can take more hits than others.",
+    "mountain": "Brute Strength: You are accustomed to wearing heavy armor without fatigue.",
+
+    "rock": "Tinker: You know how to repair small mechanical objects or locks.",
+    "forest": "Speak with Small Beasts: Small animals (squirrels, birds) naturally trust you.",
+    "cave": "Superior Darkvision: Your eyes see in total darkness as if it were day.",
+
+    "deep": "Spider Master: Living in deep caves, spiders are your allies.",
+    "surface": "Light Magic: Living above ground, you create magical lights to guide you.",
+
+    "metallic": "Dragon Breath: You can exhale fire or ice once a day.",
+    "gem": "Telepathy: You can send simple thoughts into the minds of others.",
+    "draconblood": "Royal Presence: People listen to you more attentively thanks to your charisma."
 }
 
 class ActionHelloWorld(Action):
@@ -82,7 +102,7 @@ class ActionAskWeapon(Action):
             tracker: Tracker,
             domain: Dict[Text, Any]) -> List[Dict[Text, Any]]:
 
-        player_class = tracker.get_slot("classe")
+        player_class = tracker.get_slot("class")
 
         weapons = dictWeaponPossibilityDependingClass.get(player_class, ["sword", "shield"])
 
@@ -101,7 +121,6 @@ class ActionAskWeapon(Action):
         return []
     
 class ActionAskSubrace(Action):
-    
     def name(self) -> Text:
         return "action_ask_subrace"
     
@@ -110,19 +129,43 @@ class ActionAskSubrace(Action):
             domain: Dict[Text, Any]) -> List[Dict[Text, Any]]:
 
         player_race = tracker.get_slot("race")
+        print(f"DEBUG: Race reçue = '{player_race}'")
+        
+        if not player_race:
+            dispatcher.utter_message(text="Cannot determine your current race.")
+            return []
 
-        armes_disponibles = dictWeaponPossibilityDependingClass.get(classe_actuelle, ["sword", "shield"])
+        # Récupération de la liste
+        subraces_list = dictSubraceDependingRace.get(player_race.lower(), [])
+        
+        print(f"DEBUG: Liste trouvée pour '{player_race}' = {subraces_list}")
 
-        buttons = []
-        for arme in armes_disponibles:
-            buttons.append({
-                "title": arme.capitalize(),
-                "payload": f'/weapon{{"arme": "{arme}"}}'
+        # --- CHANGEMENT ICI : On prépare du TEXTE et des BOUTONS (plus de carousel) ---
+        
+        # 1. On prépare le message d'intro
+        message_text = f"As a {player_race}, choose your legacy:\n\n"
+        
+        buttons_list = []
+        
+        for subrace_key in subraces_list:
+            # On récupère la description
+            description = dictNaturalAbilityFromSubrace.get(subrace_key, "Unknown ability")
+            display_title = subrace_key.replace("_gnome", "").replace("_drow", "").capitalize()
+
+            # 2. On ajoute la description dans le TEXTE principal (pour que le joueur la lise)
+            message_text += f"🔹 **{display_title}**: {description}\n"
+
+            # 3. On crée un bouton simple
+            buttons_list.append({
+                "title": f"Select {display_title}", 
+                "payload": f'/subrace{{"subrace": "{subrace_key}"}}'
             })
 
-        dispatcher.utter_message(
-            text=f"As a {classe_actuelle}, what weapon do you pick ?",
-            buttons=buttons
-        )
+        if not buttons_list:
+            dispatcher.utter_message(text=f"No subrace available for {player_race}.")
+            return []
+
+        # 4. On envoie le tout : Texte détaillé + Boutons en bas
+        dispatcher.utter_message(text=message_text, buttons=buttons_list)
 
         return []
