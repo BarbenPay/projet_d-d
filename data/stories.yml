@@ -25,7 +25,7 @@ stories:
 - story: path setup confirmed
   steps:
   - checkpoint: wait_for_confirmation_settings_game
-  - intent: confirm_settings_game
+  - intent: affirm
   - action: utter_start_story_settings
   #Annonce du commencement de la création de l'histoire
   - checkpoint: start_story_settings
@@ -34,7 +34,7 @@ stories:
 - story: path setup denied
   steps:
   - checkpoint: wait_for_confirmation_settings_game
-  - intent: denied_settings_game
+  - intent: deny
   - checkpoint: check_setup_loop_start
   #Recommence le welcome path
 
@@ -202,15 +202,3 @@ stories:
   - checkpoint: user_change_class
   - intent: deny
   - checkpoint: restart_class
-
-
-
-
-
-
-
-
-
-
-
-
