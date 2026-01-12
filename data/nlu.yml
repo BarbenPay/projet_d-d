@@ -111,6 +111,31 @@ nlu:
     - nightmare
     - beginner
 
+- intent: start_game
+  examples: |
+    - Hello
+    - Hi
+    - hello
+    - hi
+    - start
+    - start game
+    - new game
+    - let's play
+    - begin
+    - begin adventure
+    - launch
+    - launch the game
+    - I want to play
+    - create a character
+    - create new character
+    - start a new story
+    - let's go
+    - open the game
+    - enter the world
+    - initiate sequence
+    - boot up
+    - start RPG
+
 - intent: user_choose_race
   examples: |
     - I want to be an [elf](race)
