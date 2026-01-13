@@ -43,6 +43,10 @@ intents:
     use_entities: true
 - greet:
     use_entities: true
+- subrace:
+    use_entities: true
+- weapon:
+    use_entities: true
 entities:
 - race
 - subrace
