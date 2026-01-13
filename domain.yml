@@ -80,14 +80,8 @@ slots:
     type: rasa.shared.core.slots.TextSlot
     initial_value: null
     auto_fill: true
-    type: rasa.shared.core.slots.TextSlot
-    initial_value: null
-    auto_fill: true
     influence_conversation: true
   subrace:
-    type: rasa.shared.core.slots.TextSlot
-    initial_value: null
-    auto_fill: true
     type: rasa.shared.core.slots.TextSlot
     initial_value: null
     auto_fill: true
@@ -96,22 +90,13 @@ slots:
     type: rasa.shared.core.slots.TextSlot
     initial_value: null
     auto_fill: true
-    type: rasa.shared.core.slots.TextSlot
-    initial_value: null
-    auto_fill: true
     influence_conversation: true
   weapon:
     type: rasa.shared.core.slots.TextSlot
     initial_value: null
     auto_fill: true
-    type: rasa.shared.core.slots.TextSlot
-    initial_value: null
-    auto_fill: true
     influence_conversation: true
   attribute:
-    type: rasa.shared.core.slots.TextSlot
-    initial_value: null
-    auto_fill: true
     type: rasa.shared.core.slots.TextSlot
     initial_value: null
     auto_fill: true
