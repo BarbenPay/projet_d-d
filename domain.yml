@@ -101,6 +101,7 @@ responses:
       - Class: {class}
       - Weapon: {weapon}
       - Attribute {attribute}
+      - Ability {ability}
 
       Does everything look good?
   utter_done:

@@ -226,17 +226,17 @@ class ActionAskClassWithAbility(Action):
         
         buttons_list = []
         
-        for class_string in dictClassAbilities:
+        for class_key, class_data in dictClassAbilities.items():
 
-            description = class_string.get("desc", "Unknown description")
-            display_title = class_string.get("name", "Unknown name").capitalize()
+            description = class_data.get("desc", "Unknown description")
+            display_title = class_data.get("name", "Unknown name").capitalize()
 
             message_text += f"🔹 **{display_title}**: {description}\n\n"
 
 
             buttons_list.append({
                 "title": f"Select {display_title}", 
-                "payload": f'/race{{"race": "{class_string}"}}'
+                "payload": f'/race{{"race": "{class_key}"}}'
             })
 
 
@@ -246,6 +246,49 @@ class ActionAskClassWithAbility(Action):
             )
 
         return []
+    
+    
+class ActionFillAllTheSlot(Action):
+    def name(self) -> Text:
+        return "action_fill_all_the_slot"
+    
+    def run(self, dispatcher: CollectingDispatcher,
+            tracker: Tracker,
+            domain: Dict[Text, Any]) -> List[Dict[Text, Any]]:
+
+        player_class = tracker.get_slot("class")
+        player_subrace = tracker.get_slot("subrace")
+        
+        abilities_found = []
+
+
+        if player_class:
+
+            class_key = player_class.lower()
+
+            class_data = dictClassAbilities.get(class_key)
+            
+            if class_data:
+                ability_str = f"Class Ability ({class_data['name']}): {class_data['desc']}"
+                abilities_found.append(ability_str)
+
+        if player_subrace:
+            subrace_key = player_subrace.lower()
+
+            subrace_data = dictNaturalAbilityFromSubrace.get(subrace_key)
+            
+            if subrace_data:
+                ability_str = f"Racial Ability: {subrace_data}"
+                abilities_found.append(ability_str)
+
+        if not abilities_found:
+             dispatcher.utter_message(text="I couldn't determine your abilities yet. Please select a class and subrace first.")
+        else:
+             msg = "Abilities updated:\n" + "\n".join([f"- {a}" for a in abilities_found])
+             dispatcher.utter_message(text=msg)
+
+        return [SlotSet("abilities", abilities_found)]
+        
     
 class askLLM(Action):
     def name(self) -> Text:
@@ -269,10 +312,10 @@ class askLLM(Action):
             dispatcher.utter_message(text="Désolé, le modèle d'IA n'est pas disponible pour le moment.")
         
         character_context = ""
-        if player_race & player_subrace:
-            character_context += "Le joueur incarne un {player_race}, sa sous-race est {player_subrace}. Cela lui apporte la capacité {dictNaturalAbilityFromSubrace.get(player_subrace)}"
-        if player_class & player_weapon:
-            character_context += "Le joueur a choisis la classe {player_class}. Il a également choisis comme arme principal un(e) {player_weapon}. Cela lui apporte la capacité de base {player_abilities}."
+        if player_race and player_subrace:
+            character_context += f"Le joueur incarne un {player_race}, sa sous-race est {player_subrace}. Cela lui apporte la capacité {dictNaturalAbilityFromSubrace.get(player_subrace)}"
+        if player_class and player_weapon:
+            character_context += f"Le joueur a choisis la classe {player_class}. Il a également choisis comme arme principal un(e) {player_weapon}. Cela lui apporte la capacité de base {player_abilities}."
         
         system_prompt = (
             "Tu es un Maître de donjon expert en Dongeon & Dragon. "
@@ -285,7 +328,7 @@ class askLLM(Action):
         relevant_events = [e for e in tracker.events if e['event'] in ['user', 'bot']]
         recent_events = relevant_events[-10:]
         
-        if relevant_events & relevant_events[-1].get('text') == current_message:
+        if relevant_events and relevant_events[-1].get('text') == current_message:
             events_to_process = relevant_events[:-1][-10:]
         else:
             events_to_process = relevant_events[-10:]
