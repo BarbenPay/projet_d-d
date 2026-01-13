@@ -114,8 +114,6 @@ responses:
   utter_language_selection:
   - text: Which language would you like to use?
   - text: Hello adventurer! Ready to create your character?
-  utter_language_selection:
-  - text: Which language would you like to use?
   utter_accessibility_selection:
   - text: 'How would you like to play the game: text-based or voice-based?'
   utter_confirm_settings_game:
