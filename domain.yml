@@ -35,6 +35,14 @@ intents:
     use_entities: true
 - user_choose_attribute:
     use_entities: true
+- admin_story:
+    use_entities: true
+- admin_character:
+    use_entities: true
+- subrace:
+    use_entities: true
+- weapon:
+    use_entities: true
 entities:
 - language
 - accessibility
@@ -151,5 +159,9 @@ actions:
 - utter_ask_weapon
 - utter_ask_attribute
 - utter_give_help
+- action_ask_subrace
+- action_ask_weapon
+- action_ask_class
+- action_ask_race
 forms: {}
 e2e_actions: []

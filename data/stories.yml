@@ -4,7 +4,7 @@ stories:
 
 - story: welcome path
   steps:
-  - intent: greet
+  - intent: start_game
   #Déclenchement du jeu
   - checkpoint: check_setup_loop_start
   #Ici l'utilisateur va revenir sur le choix de la langue si il est pas d'accord avec les settings à partir de la story : path setup denied
@@ -155,7 +155,7 @@ stories:
 
   - checkpoint: restart_subrace
   # Choisir une sous race (normalement en fonction de la race)
-  - action: utter_ask_subrace
+  - action: action_ask_subrace
 
   - checkpoint: user_change_race
   # Sous race choisit
@@ -173,7 +173,7 @@ stories:
 
   - checkpoint: restart_weapon
   # Choisir une arme (normalement en fonction de la classe)
-  - action: utter_ask_weapon
+  - action: action_ask_weapon
 
   - checkpoint: user_change_class
   # Arme choisit
@@ -182,6 +182,10 @@ stories:
 
   # Le MJ va récapituler les personnalisations du personnage
   - action: utter_confirm_character
+
+  - checkpoint: user_confirm_character
+
+
 
 #######################################################################################
 
@@ -202,3 +206,17 @@ stories:
   - checkpoint: user_change_class
   - intent: deny
   - checkpoint: restart_class
+
+- story: confirm recap character
+  steps:
+  - checkpoint: user_confirm_character
+  - intent: affirm
+  - checkpoint: adventure_start
+
+- story: deny recap character
+  steps:
+  - checkpoint: user_confirm_character
+  - intent: deny
+  - checkpoint: restart_weapon
+
+#######################################################################################

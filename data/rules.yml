@@ -2,8 +2,12 @@ version: "2.0"
 
 
 rules:
-  # - rule: Dire bonjour au démarrage de la session
-  #   conversation_start: true  # <--- Indique que cela ne s'applique qu'au tout début
-  #   steps:
-  #     - intent: greet
-  #     - action: utter_ask_race
+  - rule: Go to story admin
+    steps:
+      - intent: admin_story
+      - action: utter_ask_theme
+
+  - rule: Go to character admin
+    steps:
+      - intent: admin_character
+      - action: utter_ask_race

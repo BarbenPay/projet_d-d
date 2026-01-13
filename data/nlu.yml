@@ -392,3 +392,12 @@ nlu:
     - set players to [5](number)
     - solo game
     - [single](number) player
+
+- intent: admin_story
+  examples: |
+    - admin story
+
+- intent: admin_character
+  examples: |
+    - admin character
+
