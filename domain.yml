@@ -121,6 +121,13 @@ slots:
     initial_value: null
     auto_fill: true
     influence_conversation: true
+  race_ability:
+    type: any
+    influence_conversation: false
+  class_ability:
+    type: any
+    influence_conversation: false
+    
 responses:
   utter_greet:
   - text: Hello adventurer! Ready to create your character?
