@@ -4,6 +4,12 @@ config:
 session_config:
   session_expiration_time: 60
   carry_over_slots_to_new_session: true
+version: '2.0'
+config:
+  store_entities_as_slots: true
+session_config:
+  session_expiration_time: 60
+  carry_over_slots_to_new_session: true
 intents:
 - affirm:
     use_entities: true
@@ -79,8 +85,14 @@ slots:
     type: rasa.shared.core.slots.TextSlot
     initial_value: null
     auto_fill: true
+    type: rasa.shared.core.slots.TextSlot
+    initial_value: null
+    auto_fill: true
     influence_conversation: true
   subrace:
+    type: rasa.shared.core.slots.TextSlot
+    initial_value: null
+    auto_fill: true
     type: rasa.shared.core.slots.TextSlot
     initial_value: null
     auto_fill: true
@@ -89,8 +101,14 @@ slots:
     type: rasa.shared.core.slots.TextSlot
     initial_value: null
     auto_fill: true
+    type: rasa.shared.core.slots.TextSlot
+    initial_value: null
+    auto_fill: true
     influence_conversation: true
   weapon:
+    type: rasa.shared.core.slots.TextSlot
+    initial_value: null
+    auto_fill: true
     type: rasa.shared.core.slots.TextSlot
     initial_value: null
     auto_fill: true
@@ -99,9 +117,15 @@ slots:
     type: rasa.shared.core.slots.TextSlot
     initial_value: null
     auto_fill: true
+    type: rasa.shared.core.slots.TextSlot
+    initial_value: null
+    auto_fill: true
     influence_conversation: true
 responses:
   utter_greet:
+  - text: Hello adventurer! Ready to create your character?
+  utter_language_selection:
+  - text: Which language would you like to use?
   - text: Hello adventurer! Ready to create your character?
   utter_language_selection:
   - text: Which language would you like to use?
@@ -134,8 +158,8 @@ responses:
   - text: Great! Let's start creating your character.
   utter_ask_race:
   - text: Choose a race (elf, dwarf, human, drow, gnome, dragonborn).
-  utter_ask_class:
-  - text: Choose a class (paladin, rogue, wizard, druid, monk, barbarian, bard, ranger, sorcerer).
+  utter_ask_attribute:
+  - text: What represents your character best? (Strength, Intelligence, Charisma...)
   utter_confirm_character:
   - text: |
       Here is your character:
@@ -144,12 +168,15 @@ responses:
       - Class: {class}
       - Weapon: {weapon}
       - Attribute {attribute}
+      - Ability {ability}
 
       Does everything look good?
+  utter_done:
+  - text: Perfect! Your character has been created.
 actions:
-- utter_ask_subrace
-- utter_ask_weapon
-- utter_ask_attribute
-- utter_give_help
+- action_ask_subrace
+- action_ask_weapon
+- action_check_weapon
+- action_ask_class_with_ability
 forms: {}
 e2e_actions: []

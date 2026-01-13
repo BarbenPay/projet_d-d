@@ -1,204 +1,76 @@
 version: "2.0"
-
 stories:
-
-- story: welcome path
-  steps:
-  - intent: start_game
-  #Déclenchement du jeu
-  - checkpoint: check_setup_loop_start
-  #Ici l'utilisateur va revenir sur le choix de la langue si il est pas d'accord avec les settings à partir de la story : path setup denied
-  - action: utter_language_selection
-  #Le MJ propose les langues
-  - intent: language_selection
-  #Selection du langage
-  - action: utter_accessibility_selection
-  #Le MJ propose comment le jeu va etre joué (écrit ou oral)
-  - intent: accessibility_selection
-  #Selection de accessibility
-  - action: utter_confirm_settings_game
-  #Recap des paramètres choisis
-  - checkpoint: wait_for_confirmation_settings_game
-
-#######################################################################################
-
-- story: path setup confirmed
-  steps:
-  - checkpoint: wait_for_confirmation_settings_game
-  - intent: affirm
-  - action: utter_start_story_settings
-  #Annonce du commencement de la création de l'histoire
-  - checkpoint: start_story_settings
-  #Va directement sur les paramètres de l'histoire
-
-- story: path setup denied
-  steps:
-  - checkpoint: wait_for_confirmation_settings_game
-  - intent: deny
-  - checkpoint: check_setup_loop_start
-  #Recommence le welcome path
-
-#######################################################################################
-
-#######################################################################################
-
-                      # - story: story settings
-                      #   steps:
-                      #   - checkpoint: start_story_settings
-
-                      #   # On active le formulaire
-                      #   - action: game_settings_form
-                      #   - active_loop: game_settings_form
-                      #     #Ici on a la création d'une loop. Tant que l'utilisateur n'a pas rempli les 3 variables (story_theme, story_difficulty, story_players)
-                      #     #Donc une création de slot pour stocker les variables. Le bot demande le theme mais comme il est dans la loop la réponse de la difficulty
-                      #     #ne fera pas planter le code. Il remplira la variable en le précisant au joueur et redemandera le theme si il n'a pas été donné. 
-                      #   - active_loop: null
-                      #   - slot_was_set:
-                      #     - requested_slot: null
-
-                      #   # Une fois sorti de la boucle, on confirme
-                      #   - action: utter_confirm_settings_story
-                      #   - checkpoint: wait_for_confirmation_settings_story
-
-- story: story settings
-  steps:
-  #On arrive ici quand les paramètres du jeu ont été finalisés.
-  - checkpoint: start_story_settings
-
-  #Le checkpoint permet de repere lors d'un retour en arrière. Par exemple depuis la difficulé si on veut revenir en arrière on a alors ce flag.
-  - checkpoint: restart_theme
-  #Demande du theme de l'histoire.
-  - action: utter_ask_theme
-  - intent: user_choose_theme
-
-
-  - checkpoint: restart_difficulty
-  - action: utter_ask_difficulty
-
-  #Ce flag nous permet d'accéder à la story, si l'utilisateur n'est pas content de son choix. Il revient alors en arrière : Choix Du Theme
-  - checkpoint: modification_theme
-  - intent: user_choose_difficulty
-
-  #Flag pour revenir si l'utilisateur n'est pas content du récap général
-  - checkpoint: restart_number_player
-  - action: utter_ask_number_player
-
-  - checkpoint: modification_difficulty
-  - intent: user_choose_number_player
-
-  - action: utter_confirm_story
-  - checkpoint: wait_for_confirmation_settings_story
-
-#######################################################################################
-
-- story: story settings theme change
-  steps:
-  - checkpoint: modification_theme
-  - intent: deny
-  - checkpoint: restart_theme
-
-- story: story settings difficulty change
-  steps:
-  - checkpoint: modification_difficulty
-  - intent: deny
-  - checkpoint: restart_difficulty
-
-
-- story: story settings confirmed
-  steps:
-  - checkpoint: wait_for_confirmation_settings_story
-  - intent: affirm
-  - action: utter_start_creation_character
-  - checkpoint: create_character
-
-- story: story settings denied
-  steps:
-  - checkpoint: wait_for_confirmation_settings_story
-  - intent: deny
-  - checkpoint: restart_number_player
-
-#######################################################################################
-
-#######################################################################################
-
-                    # - story: character creation
-                    #   steps:
-                    #   - checkpoint: create_character
-                      
-                    #   # Ici on lance le formulaire via une action.py qui va demander Race puis la sous race en fonction de la race. De même pour 
-                    #   # classe/arme et les attributs
-                    #   - action: caracter_creation_form
-                    #   - active_loop: caracter_creation_form
-                    #   - active_loop: null
-                    #   - slot_was_set:
-                    #     - requested_slot: null
-                      
-                    #   - action: action_submit_character
-                      
-                    #   # On capte que le code python est fini et on passe au suivant.
-                    #   - slot_was_set:
-                    #     - is_creation_finished: true
-                        
-                    #   - action: utter_all_characters_ready
-                    #   - action: utter_start_adventure
-
 - story: character creation
   steps:
-  - checkpoint: create_character
-
-  - checkpoint: restart_race
-  # Choisir une race
   - action: utter_ask_race
-  # Race choisit
   - intent: user_choose_race
-
-
-  - checkpoint: restart_subrace
-  # Choisir une sous race (normalement en fonction de la race)
-  - action: utter_ask_subrace
-
-  - checkpoint: user_change_race
-  # Sous race choisit
+  - action: action_ask_subrace
   - intent: user_choose_subrace
-
-
-  - checkpoint: restart_class
-  # Choisir une classe
   - action: utter_ask_class
-
-  - checkpoint: user_change_subrace
-  # Classe choisit
   - intent: user_choose_class
-
-
-  - checkpoint: restart_weapon
-  # Choisir une arme (normalement en fonction de la classe)
-  - action: utter_ask_weapon
-
-  - checkpoint: user_change_class
-  # Arme choisit
+  - action: action_ask_weapon
   - intent: user_choose_weapon
+  - action: utter_confirm_character
+  
 
-
-  # Le MJ va récapituler les personnalisations du personnage
+- story: Story from Conversation ID 238e7ae4e6b146a39dfa1d823deba0cc
+  steps:
+  - intent: greet
+  - action: utter_ask_race
+  - intent: user_choose_race
+  - slot_was_set:
+    - race: dwarf
+  - action: action_ask_subrace
+  - intent: deny
+  - action: utter_ask_race
+  - intent: user_choose_race
+  - slot_was_set:
+    - race: elf
+  - action: action_ask_subrace
+  - intent: user_choose_subrace
+  - intent: subrace
+    entities:
+    - subrace: high
+  - slot_was_set:
+    - subrace: high
+  - action: utter_ask_class
+  - intent: user_choose_class
+  - action: action_ask_weapon
+  - intent: user_choose_weapon
   - action: utter_confirm_character
 
-#######################################################################################
 
-- story: character creation change race
+- story: Story from Conversation ID b7ef9fdcfcce4671b01b812f700913f4
   steps:
-  - checkpoint: user_change_race
+  - intent: greet
+  - action: utter_ask_race
+  - intent: user_choose_race
+  - action: action_ask_subrace
+  - intent: user_choose_race
+    entities:
+    - race: drow
+  - slot_was_set:
+    - race: drow
+  - action: action_ask_subrace
   - intent: deny
-  - checkpoint: restart_race
-
-- story: character creation change subrace
-  steps:
-  - checkpoint: user_change_subrace
-  - intent: deny
-  - checkpoint: restart_subrace
-
-- story: character creation change class
-  steps:
-  - checkpoint: user_change_class
-  - intent: deny
-  - checkpoint: restart_class
+  - action: utter_ask_race
+  - intent: user_choose_race
+  - action: action_ask_subrace
+  - intent: subrace
+    entities:
+    - subrace: surface
+  - slot_was_set:
+    - subrace: surface
+  - action: utter_ask_class
+  - intent: user_choose_class
+    entities:
+    - class: wizard
+  - slot_was_set:
+    - class: wizard
+  - action: action_ask_weapon
+  - intent: weapon
+    entities:
+    - weapon: orb
+  - slot_was_set:
+    - weapon: orb
+  - action: utter_confirm_character
