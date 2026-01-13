@@ -1,13 +1,23 @@
 version: "2.0"
 
-
 rules:
-  - rule: Go to story admin
-    steps:
-      - intent: admin_story
-      - action: utter_ask_theme
 
-  - rule: Go to character admin
-    steps:
-      - intent: admin_character
-      - action: utter_ask_race
+# --- Règle pour interrompre les settings du jeu ---
+- rule: Interruption game settings
+  condition:
+  - active_loop: game_settings_form  # On nomme explicitement le form (String)
+  steps:
+  - intent: user_choose_reset      # "Stop", "Annuler"
+  - action: action_deactivate_loop # On tue la loop
+  - active_loop: null              # On confirme qu'elle est morte
+  - action: utter_confirm_settings_game # Optionnel : retour au menu précédent
+
+# --- Règle pour interrompre la création de perso ---
+- rule: Interruption character creation
+  condition:
+  - active_loop: caracter_creation_form # On nomme explicitement le form (String)
+  steps:
+  - intent: user_choose_reset
+  - action: action_deactivate_loop
+  - active_loop: null
+  - action: utter_confirm_story # Optionnel : retour au menu précédent

@@ -1,116 +1,5 @@
 version: "2.0"
-
 nlu:
-- regex: number
-  examples: |
-    - \d+
-
-- lookup: race
-  examples: |
-    - elf
-    - dwarf
-    - human
-    - drow
-    - gnome
-    - dragonborn
-
-- lookup: subrace
-  examples: |
-    # --- Elf Subraces ---
-    - high
-    - wood
-    # --- Dwarf Subraces ---
-    - hill
-    - mountain
-    # --- Gnome Subraces ---
-    - rock
-    - forest
-    - cave
-    # --- Drow Factions ---
-    - deep
-    - surface
-    # --- Dragonborn Ancestries ---
-    - metallic
-    - gem
-    - draconblood
-
-- lookup: weapon
-  examples: |
-    - sword
-    - longsword
-    - bow
-    - axe
-    - mace
-    - staff
-    - dagger
-    - hammer
-    - shield
-    - orb
-    - luth
-
-- lookup: class
-  examples: |
-    - paladin
-    - rogue
-    - wizard
-    - druid
-    - monk
-    - barbarian
-    - bard
-    - ranger
-    - sorcerer
-
-- lookup: attribute
-  examples: |
-    - strength
-    - dexterity
-    - constitution
-    - intelligence
-    - wisdom
-    - charisma
-    - power
-    - agility
-    - stamina
-    - magic
-
-- lookup: language
-  examples: |
-    - english
-    - french
-    - francais
-    - spanish
-    - german
-
-- lookup: accessibility
-  examples: |
-    - audio
-    - text
-    - voice only
-    - text only
-    - blind
-    - deaf
-
-- lookup: theme
-  examples: |
-    - fantasy
-    - dark fantasy
-    - horror
-    - comedy
-    - epic
-    - investigation
-    - mystery
-    - dungeon crawler
-    - cyberpunk
-
-- lookup: difficulty
-  examples: |
-    - easy
-    - normal
-    - hard
-    - expert
-    - nightmare
-    - beginner
-
 - intent: start_game
   examples: |
     - Hello
@@ -135,7 +24,9 @@ nlu:
     - initiate sequence
     - boot up
     - start RPG
-
+    - launch the adventure
+    - begin game
+    - I am ready to start
 - intent: user_choose_race
   examples: |
     - I want to be an [elf](race)
@@ -154,54 +45,40 @@ nlu:
     - [elf](race) is my choice
     - definitely [human](race)
     - let's be a wizard (race)
-
 - intent: user_choose_subrace
   examples: |
-    # --- Elfes ---
     - I choose [high](subrace) elf
     - I want to be a [wood](subrace) elf
     - just [high](subrace)
     - [wood](subrace) ancestry
     - I am a [high](subrace) elf
     - pick [wood](subrace)
-
-    # --- Nains ---
     - [hill](subrace) dwarf
     - I pick [mountain](subrace)
     - [mountain](subrace) dwarf
     - I come from the [hill](subrace)s
     - [hill](subrace)
-
-    # --- Gnomes ---
     - [rock](subrace) gnome
     - I am a [forest](subrace) gnome
     - [deep](subrace) gnome
     - [rock](subrace)
     - [forest](subrace)
     - [cave](subrace)
-
-    # --- Drows (Simplifiés) ---
     - I want to be a [deep](subrace) drow
     - I choose [surface](subrace)
     - [surface](subrace) drow
     - [deep](subrace) one
-
-    # --- Dragonborn ---
     - [metallic](subrace) ancestry
     - [gem](subrace) dragonborn
     - [draconblood](subrace)
     - I have [metallic](subrace) scales
     - [gem](subrace) type
     - [draconblood](subrace) variant
-
 - intent: user_choose_class
   examples: |
-    # Mots seuls
     - [wizard](class)
     - [rogue](class)
     - [paladin](class)
-    
-    # Phrases de choix
     - I want to be a [wizard](class)
     - I select the [rogue](class) class
     - make me a [barbarian](class)
@@ -210,23 +87,17 @@ nlu:
     - I prefer [sorcerer](class)
     - [druid](class) is my choice
     - I choose to be a [bard](class)
-    
-    # Contextes variés
     - my class is [paladin](class)
     - create a [monk](class)
     - let's go with [barbarian](class)
     - set class to [ranger](class)
     - I am a [sorcerer](class)
     - the [druid](class) class
-
 - intent: user_choose_weapon
   examples: |
-    # Mots seuls
     - [sword](weapon)
     - [bow](weapon)
     - [staff](weapon)
-    
-    # Phrases d'équipement
     - I equip my [sword](weapon)
     - [longsword](weapon)
     - I take the [bow](weapon)
@@ -236,8 +107,6 @@ nlu:
     - [dagger](weapon)
     - [hammer](weapon)
     - [shield](weapon)
-    
-    # Verbes d'action
     - I wield a [longsword](weapon)
     - give me the [orb](weapon)
     - I fight with a [mace](weapon)
@@ -246,10 +115,8 @@ nlu:
     - I want the [axe](weapon)
     - equip [shield](weapon)
     - use [hammer](weapon)
-
 - intent: user_choose_attribute
   examples: |
-    # Choix simple de l'attribut (Focus)
     - I want to be [strong](attribute)
     - prioritize [intelligence](attribute)
     - my best stat is [charisma](attribute)
@@ -258,8 +125,6 @@ nlu:
     - [constitution](attribute) is important
     - I choose [agility](attribute)
     - increase my [magic](attribute)
-    
-    # Attribution de points (Avec Regex Number)
     - I have [15](number) in [wisdom](attribute)
     - set [strength](attribute) to [18](number)
     - [dexterity](attribute) [14](number)
@@ -269,7 +134,6 @@ nlu:
     - assign [12](number) to [power](attribute)
     - [agility](attribute) should be [13](number)
     - set [stamina](attribute) to [15](number)
-    
 - intent: affirm
   examples: |
     - yes
@@ -287,7 +151,6 @@ nlu:
     - yes let's play with this
     - sounds perfect for the theme
     - confirm language
-
 - intent: deny
   examples: |
     - no
@@ -305,7 +168,6 @@ nlu:
     - I want to change options
     - these are not the right settings
     - reject
-
 - intent: user_ask_help
   examples: |
     - help
@@ -316,7 +178,6 @@ nlu:
     - I am lost
     - give me a hint
     - what does this mean?
-
 - intent: user_choose_reset
   examples: |
     - go back
@@ -331,18 +192,6 @@ nlu:
     - begin again
     - I want to start a new character
     - delete and restart
-
-- intent: start_game
-  examples: |
-    - start game
-    - let's play
-    - launch the adventure
-    - begin game
-    - start
-    - I am ready to start
-    - let's go
-    - open the game
-
 - intent: language_selection
   examples: |
     - I speak [english](language)
@@ -351,7 +200,6 @@ nlu:
     - [francais](language)
     - I want to play in [english](language)
     - set language to [german](language)
-
 - intent: accessibility_selection
   examples: |
     - enable [audio](accessibility) mode
@@ -361,7 +209,6 @@ nlu:
     - [voice only](accessibility)
     - set accessibility to [high contrast](accessibility)
     - [simplified](accessibility) mode please
-
 - intent: user_choose_theme
   examples: |
     - I want a [fantasy](theme) adventure
@@ -371,7 +218,7 @@ nlu:
     - set theme to [mystery](theme)
     - [epic](theme) style
     - [investigation](theme)
-
+    - I want steampunk
 - intent: user_choose_difficulty
   examples: |
     - [easy](difficulty) mode
@@ -381,7 +228,6 @@ nlu:
     - [normal](difficulty)
     - I am a [beginner](difficulty)
     - [expert](difficulty) challenge
-
 - intent: user_choose_number_player
   examples: |
     - [1](number) player
@@ -392,12 +238,104 @@ nlu:
     - set players to [5](number)
     - solo game
     - [single](number) player
-
 - intent: admin_story
   examples: |
     - admin story
-
 - intent: admin_character
   examples: |
     - admin character
-
+- regex: number
+  examples: |
+    - \d+
+- lookup: race
+  examples: |
+    - elf
+    - dwarf
+    - human
+    - drow
+    - gnome
+    - dragonborn
+- lookup: subrace
+  examples: |
+    - high
+    - wood
+    - hill
+    - mountain
+    - rock
+    - forest
+    - cave
+    - deep
+    - surface
+    - metallic
+    - gem
+    - draconblood
+- lookup: weapon
+  examples: |
+    - sword
+    - longsword
+    - bow
+    - axe
+    - mace
+    - staff
+    - dagger
+    - hammer
+    - shield
+    - orb
+    - luth
+- lookup: class
+  examples: |
+    - paladin
+    - rogue
+    - wizard
+    - druid
+    - monk
+    - barbarian
+    - bard
+    - ranger
+    - sorcerer
+- lookup: attribute
+  examples: |
+    - strength
+    - dexterity
+    - constitution
+    - intelligence
+    - wisdom
+    - charisma
+    - power
+    - agility
+    - stamina
+    - magic
+- lookup: language
+  examples: |
+    - english
+    - french
+    - francais
+    - spanish
+    - german
+- lookup: accessibility
+  examples: |
+    - audio
+    - text
+    - voice only
+    - text only
+    - blind
+    - deaf
+- lookup: theme
+  examples: |
+    - fantasy
+    - dark fantasy
+    - horror
+    - comedy
+    - epic
+    - investigation
+    - mystery
+    - dungeon crawler
+    - cyberpunk
+- lookup: difficulty
+  examples: |
+    - easy
+    - normal
+    - hard
+    - expert
+    - nightmare
+    - beginner

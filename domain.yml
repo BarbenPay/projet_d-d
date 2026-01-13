@@ -128,7 +128,7 @@ responses:
   - text: What theme do you want for the adventure (dark fantasy, high fantasy, steampunk...)?
   utter_ask_difficulty:
   - text: Choose a difficulty (easy, normal, hard).
-  utter_ask_number_player:
+  utter_ask_nb_players:
   - text: How many players will join the game?
   utter_confirm_story:
   - text: |
@@ -163,5 +163,27 @@ actions:
 - action_ask_weapon
 - action_ask_class
 - action_ask_race
-forms: {}
+forms:
+  game_settings_form:
+    required_slots:
+      theme:
+      - entity: theme
+        type: from_entity
+      difficulty:
+      - entity: difficulty
+        type: from_entity
+      nb_players:
+      - entity: number
+        type: from_entity
+  caracter_creation_form:
+    required_slots:
+      class:
+      - entity: class
+        type: from_entity
+      race:
+      - entity: race
+        type: from_entity
+      weapon:
+      - entity: weapon
+        type: from_entity
 e2e_actions: []
