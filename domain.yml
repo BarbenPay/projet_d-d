@@ -108,6 +108,11 @@ slots:
     initial_value: null
     auto_fill: true
     influence_conversation: true
+  adventure_text:
+    type: text
+    initial_value: null
+    auto_fill: false
+    influence_conversation: false
 responses:
   utter_greet:
   - text: Hello adventurer! Ready to create your character?
@@ -154,6 +159,8 @@ responses:
       - Attribute {attribute}
 
       Does everything look good?
+  utter_ask_adventure_text:
+  - text: "Que faites-vous ?"
 actions:
 - utter_ask_subrace
 - utter_ask_weapon
@@ -166,14 +173,14 @@ actions:
 forms:
   game_settings_form:
     required_slots:
-      theme:
-      - entity: theme
-        type: from_entity
       difficulty:
       - entity: difficulty
         type: from_entity
       nb_players:
       - entity: number
+        type: from_entity
+      theme:
+      - entity: theme
         type: from_entity
   caracter_creation_form:
     required_slots:
@@ -183,7 +190,15 @@ forms:
       race:
       - entity: race
         type: from_entity
+      subrace:
+      - entity: subrace
+        type: from_entity
       weapon:
       - entity: weapon
         type: from_entity
+  adventure_form:
+    required_slots:
+      adventure_text:
+      - type: from_text
+        not_intent: user_choose_reset
 e2e_actions: []

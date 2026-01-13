@@ -1,16 +1,36 @@
 # This files contains your custom actions which can be used to run
 # custom Python code.
-#
-# See this guide on how to implement these action:
-# https://rasa.com/docs/rasa/custom-actions
-
-
-# This is a simple example for a custom action which utters "Hello World!"
 
 from typing import Any, Text, Dict, List
 from rasa_sdk import Action, Tracker
-from rasa_sdk.events import SlotSet
+from rasa_sdk.events import SlotSet, ActiveLoop
 from rasa_sdk.executor import CollectingDispatcher
+from rasa_sdk.forms import FormValidationAction
+
+# --- Chargement du LLM (Optionnel) ---
+try:
+    from llama_cpp import Llama
+    print("Librairie llama-cpp-python chargée avec succès.")
+except ImportError:
+    print("Erreur: llama-cpp-python n'est pas installé.")
+    Llama = None
+    
+MODEL_PATH = "./models/Meta-Llama-3.1-8B-Instruct-Q3_K_M.gguf"
+
+llm = None
+if Llama:
+    try:
+        llm = Llama(
+            model_path=MODEL_PATH,
+            n_ctx=2048,
+            n_threads=4,
+            verbose=False
+        )
+        print(f"Modèle chargé depuis {MODEL_PATH}")
+    except Exception as e:
+        print(f"Impossible de charger le modèle : {e}")
+
+# --- Données du jeu ---
 
 dictWeaponPossibilityDependingClass = {
             "paladin": ["longsword", "hammer", "shield", "mace", "sword"],
@@ -20,12 +40,51 @@ dictWeaponPossibilityDependingClass = {
             "ranger": ["bow", "dagger", "axe", "longsword"],
             "monk": ["staff", "dagger"],
 
-            "wizard": ["staff", "orb", "dagger"],
+            "wizard": ["staff", "orb"],
             "sorcerer": ["orb", "staff", "dagger"],
             "druid": ["staff", "mace"],
 
             "bard": ["luth", "dagger", "sword", "bow"]
                            }
+
+dictClassAbilities = {
+    "paladin": {
+        "name": "Divine Guardian",
+        "desc": "Grants +1 AC to adjacent allies when holding a Shield."
+    },
+    "barbarian": {
+        "name": "Feral Instinct",
+        "desc": "Deals +2 damage when HP is below 50%."
+    },
+    "rogue": {
+        "name": "Cheap Shot",
+        "desc": "First attack of combat deals bonus damage."
+    },
+    "ranger": {
+        "name": "Hunter's Mark",
+        "desc": "Consecutive attacks on the same target deal +2 damage."
+    },
+    "monk": {
+        "name": "Flow of Ki",
+        "desc": "Successful attacks increase Dodge chance by 10%."
+    },
+    "wizard": {
+        "name": "Arcane Study",
+        "desc": "Identifies enemy weaknesses using an Orb."
+    },
+    "sorcerer": {
+        "name": "Unstable Power",
+        "desc": "Re-roll damage results of 1 on spells."
+    },
+    "druid": {
+        "name": "Nature's Touch",
+        "desc": "Passive health regeneration of 2 HP per turn."
+    },
+    "bard": {
+        "name": "Inspiring Tune",
+        "desc": "Allies gain +1 Attack when the Bard holds a Luth."
+    }
+}
 
 dictSubraceDependingRace = {
     "elf" : ["high", "wood"],
@@ -54,6 +113,8 @@ dictNaturalAbilityFromSubrace = {
     "draconblood": "Royal Presence: People listen to you more attentively thanks to your charisma."
 }
 
+# --- Actions ---
+
 class ActionHelloWorld(Action):
 
      def name(self) -> Text:
@@ -64,7 +125,6 @@ class ActionHelloWorld(Action):
              domain: Dict[Text, Any]) -> List[Dict[Text, Any]]:
 
          dispatcher.utter_message(text="Hello World!")
-
          return []
      
 class ActionCheckWeapon(Action):
@@ -84,11 +144,8 @@ class ActionCheckWeapon(Action):
             return []
         
         if player_weapon not in dictWeaponPossibilityDependingClass.get(player_class):
-
             dispatcher.utter_message(text=f"A {player_class} can not pick a {player_weapon} !")
-
             return [SlotSet("weapon", None)]
-
         else:
             dispatcher.utter_message(text=f"Alright ! Your {player_class} is stuffed with a {player_weapon}.")
             return []
@@ -103,19 +160,13 @@ class ActionAskWeapon(Action):
             domain: Dict[Text, Any]) -> List[Dict[Text, Any]]:
 
         player_class = tracker.get_slot("class")
-
         weapons = dictWeaponPossibilityDependingClass.get(player_class, ["sword", "shield"])
-
-        buttons = []
-        for weapon in weapons:
-            buttons.append({
-                "title": weapon.capitalize(),
-                "payload": f'/weapon{{"weapon": "{weapon}"}}'
-            })
+        
+        # Affichage texte simple des options
+        options_display = ", ".join([w.capitalize() for w in weapons])
 
         dispatcher.utter_message(
-            text=f"As a {player_class}, what weapon do you pick ?",
-            buttons=buttons
+            text=f"As a {player_class}, choose your weapon ({options_display}):"
         )
 
         return []
@@ -135,37 +186,220 @@ class ActionAskSubrace(Action):
             dispatcher.utter_message(text="Cannot determine your current race.")
             return []
 
-        # Récupération de la liste
         subraces_list = dictSubraceDependingRace.get(player_race.lower(), [])
         
-        print(f"DEBUG: Liste trouvée pour '{player_race}' = {subraces_list}")
-
-        # --- CHANGEMENT ICI : On prépare du TEXTE et des BOUTONS (plus de carousel) ---
-        
-        # 1. On prépare le message d'intro
         message_text = f"As a {player_race}, choose your legacy:\n\n"
         
-        buttons_list = []
-        
         for subrace_key in subraces_list:
-            # On récupère la description
             description = dictNaturalAbilityFromSubrace.get(subrace_key, "Unknown ability")
-            display_title = subrace_key.replace("_gnome", "").replace("_drow", "").capitalize()
-
-            # 2. On ajoute la description dans le TEXTE principal (pour que le joueur la lise)
+            display_title = subrace_key.capitalize()
             message_text += f"🔹 **{display_title}**: {description}\n"
-
-            # 3. On crée un bouton simple
-            buttons_list.append({
-                "title": f"Select {display_title}", 
-                "payload": f'/subrace{{"subrace": "{subrace_key}"}}'
-            })
-
-        if not buttons_list:
-            dispatcher.utter_message(text=f"No subrace available for {player_race}.")
-            return []
-
-        # 4. On envoie le tout : Texte détaillé + Boutons en bas
-        dispatcher.utter_message(text=message_text, buttons=buttons_list)
+        
+        # CORRECTION BUG: L'envoi du message manquait ici !
+        dispatcher.utter_message(text=message_text)
 
         return []
+    
+class ActionAskClassWithAbility(Action):
+    def name(self) -> Text:
+        # Renommé pour correspondre au slot 'class'
+        return "action_ask_class"
+    
+    def run(self, dispatcher: CollectingDispatcher,
+            tracker: Tracker,
+            domain: Dict[Text, Any]) -> List[Dict[Text, Any]]:
+
+        message_text = f"Choose a class from the list below:\n\n"
+        
+        for class_key, class_data in dictClassAbilities.items():
+            description = class_data.get("desc", "Unknown description")
+            display_title = class_data.get("name", "Unknown name").capitalize()
+            # On affiche tout en texte
+            message_text += f"🔹 **{class_key.capitalize()}** ({display_title}): {description}\n"
+
+        dispatcher.utter_message(text=message_text)
+
+        return []
+    
+    
+class ActionFillAllTheSlot(Action):
+    def name(self) -> Text:
+        return "action_fill_all_the_slot"
+    
+    def run(self, dispatcher: CollectingDispatcher,
+            tracker: Tracker,
+            domain: Dict[Text, Any]) -> List[Dict[Text, Any]]:
+
+        player_class = tracker.get_slot("class")
+        player_subrace = tracker.get_slot("subrace")
+        
+        abilities_found = []
+
+        if player_class:
+            class_key = player_class.lower()
+            class_data = dictClassAbilities.get(class_key)
+            if class_data:
+                ability_str = f"Class Ability ({class_data['name']}): {class_data['desc']}"
+                abilities_found.append(ability_str)
+
+        if player_subrace:
+            subrace_key = player_subrace.lower()
+            subrace_data = dictNaturalAbilityFromSubrace.get(subrace_key)
+            if subrace_data:
+                ability_str = f"Racial Ability: {subrace_data}"
+                abilities_found.append(ability_str)
+
+        if not abilities_found:
+             dispatcher.utter_message(text="I couldn't determine your abilities yet. Please select a class and subrace first.")
+        else:
+             msg = "Abilities updated:\n" + "\n".join([f"- {a}" for a in abilities_found])
+             dispatcher.utter_message(text=msg)
+
+        return [SlotSet("abilities", abilities_found)]
+    
+
+class ActionAskRace(Action):
+    def name(self) -> Text:
+        return "action_ask_race"
+
+    def run(self, dispatcher: CollectingDispatcher,
+            tracker: Tracker,
+            domain: Dict[Text, Any]) -> List[Dict[Text, Any]]:
+
+        available_races = list(dictSubraceDependingRace.keys())
+        if "human" not in available_races:
+             available_races.append("human")
+
+        # Affichage texte simple
+        races_str = ", ".join([r.capitalize() for r in available_races])
+        
+        dispatcher.utter_message(
+            text=f"Choose a race for your character ({races_str}):"
+        )
+
+        return []
+    
+class ValidateCaracterCreationForm(FormValidationAction):
+    def name(self) -> Text:
+        return "validate_caracter_creation_form"
+
+    def required_slots(
+        self,
+        domain_slots: List[Text],
+        dispatcher: CollectingDispatcher,
+        tracker: Tracker,
+        domain: Dict[Text, Any],
+    ) -> List[Text]:
+        
+        print("DEBUG: Je force l'ordre des slots via Python !") 
+        return ["race", "subrace", "class", "weapon"]
+        
+    
+class ValidateAdventureForm(FormValidationAction):
+    def name(self) -> Text:
+        return "validate_adventure_form"
+
+    def validate_adventure_text(
+        self,
+        slot_value: Any,
+        dispatcher: CollectingDispatcher,
+        tracker: Tracker,
+        domain: Dict[Text, Any],
+    ) -> Dict[Text, Any]:
+
+        # 1. Vérification du LLM
+        if 'llm' not in globals() or llm is None:
+            dispatcher.utter_message(text="[Système] Le Narrateur n'est pas connecté.")
+            return {"adventure_text": None}
+
+        # 2. Récupération de TOUS les slots pertinents
+        # Settings du jeu
+        theme = tracker.get_slot("theme") or "Médiéval Fantastique"
+        difficulty = tracker.get_slot("difficulty") or "Normale"
+        nb_players = tracker.get_slot("nb_players") or "1"
+        language = tracker.get_slot("language") or "Français"
+        
+        # Fiche personnage
+        p_race = tracker.get_slot("race") or "Inconnu"
+        p_subrace = tracker.get_slot("subrace") or ""
+        p_class = tracker.get_slot("class") or "Aventurier"
+        p_weapon = tracker.get_slot("weapon") or "Mains nues"
+        p_attribute = tracker.get_slot("attribute") or "Aucun"
+        # On essaie de récupérer les capacités si le slot existe, sinon chaîne vide
+        p_abilities = tracker.get_slot("abilities") 
+        if isinstance(p_abilities, list):
+            p_abilities = ", ".join(p_abilities)
+        
+        # 3. Construction du Prompt Système (Le "Cerveau" du DM)
+        # On lui donne toutes les billes pour qu'il soit cohérent.
+        system_prompt = (
+            f"Tu es un Maître du Donjon (MJ) expert pour un jeu de rôle textuel. \n"
+            f"LANGUE DE RÉPONSE: {language}. \n\n"
+            f"--- PARAMÈTRES DE LA PARTIE ---\n"
+            f"Thème: {theme}\n"
+            f"Difficulté: {difficulty}\n"
+            f"Nombre de joueurs: {nb_players}\n\n"
+            f"--- FICHE PERSONNAGE ---\n"
+            f"Race: {p_race} ({p_subrace})\n"
+            f"Classe: {p_class}\n"
+            f"Arme principale: {p_weapon}\n"
+            f"Attribut majeur: {p_attribute}\n"
+            f"Capacités spéciales: {p_abilities}\n\n"
+            f"--- INSTRUCTIONS ---\n"
+            f"1. Tu dois décrire l'action, l'environnement et les réactions des PNJ de manière immersive.\n"
+            f"2. Prends en compte la difficulté ({difficulty}) pour décider si les actions du joueur réussissent ou échouent.\n"
+            f"3. Sois concis : Ne fais pas de monologues trop longs (max 3-4 phrases).\n"
+            f"4. Ne joue jamais à la place du joueur. Demande-lui ce qu'il fait ensuite."
+        )
+
+        # 4. Fenêtre Glissante (Sliding Window) de l'historique
+        # On récupère les événements, on filtre pour n'avoir que User et Bot
+        events = [e for e in tracker.events if e['event'] in ['user', 'bot']]
+        
+        # On garde les 10 derniers échanges (donc 20 messages max : 10 users + 10 bots)
+        # On exclut le tout dernier message utilisateur car il sera ajouté juste après dans le prompt
+        past_events = events[:-1][-20:] 
+
+        history_text = ""
+        for event in past_events:
+            if event['event'] == 'user' and event.get('text'):
+                history_text += f"<|start_header_id|>user<|end_header_id|>\n\n{event.get('text')}<|eot_id|>"
+            elif event['event'] == 'bot' and event.get('text'):
+                # On évite de remettre les messages techniques de Rasa s'il y en a
+                history_text += f"<|start_header_id|>assistant<|end_header_id|>\n\n{event.get('text')}<|eot_id|>"
+
+        # 5. Message actuel de l'utilisateur
+        current_message = slot_value
+
+        # 6. Assemblage du Prompt Final (Format Llama 3)
+        full_prompt = (
+            f"<|begin_of_text|><|start_header_id|>system<|end_header_id|>\n\n"
+            f"{system_prompt}<|eot_id|>\n"
+            f"{history_text}"
+            f"<|start_header_id|>user<|end_header_id|>\n\n"
+            f"{current_message}<|eot_id|>\n"
+            f"<|start_header_id|>assistant<|end_header_id|>\n\n"
+        )
+
+        print("DEBUG: Envoi au LLM...") # Utile pour voir si ça bloque
+        
+        try:
+            output = llm(
+                full_prompt,
+                max_tokens=400,       # Un peu plus de place pour la narration
+                stop=["<|eot_id|>", "<|start_header_id|>"], # Stop tokens stricts pour Llama 3
+                echo=False,
+                temperature=0.7,      # Créatif mais pas délirant
+                top_p=0.9
+            )
+            response_text = output['choices'][0]['text'].strip()
+            
+            # Envoi de la réponse au joueur
+            dispatcher.utter_message(text=response_text)
+            
+        except Exception as e:
+            print(f"ERREUR LLM : {e}")
+            dispatcher.utter_message(text="Une perturbation magique brouille les sens du Maître du Donjon... (Erreur technique)")
+
+        # 7. IMPORTANT : Reset du slot pour la boucle infinie
+        return {"adventure_text": None}
