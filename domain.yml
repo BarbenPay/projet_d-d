@@ -4,12 +4,7 @@ config:
 session_config:
   session_expiration_time: 60
   carry_over_slots_to_new_session: true
-version: '2.0'
-config:
-  store_entities_as_slots: true
-session_config:
-  session_expiration_time: 60
-  carry_over_slots_to_new_session: true
+
 intents:
 - affirm:
     use_entities: true
@@ -127,7 +122,7 @@ slots:
   class_ability:
     type: any
     influence_conversation: false
-    
+
 responses:
   utter_greet:
   - text: Hello adventurer! Ready to create your character?
