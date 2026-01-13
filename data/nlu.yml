@@ -68,10 +68,7 @@ nlu:
     - intelligence
     - wisdom
     - charisma
-    - power
-    - agility
     - stamina
-    - magic
 
 - lookup: language
   examples: |
@@ -371,6 +368,8 @@ nlu:
     - set theme to [mystery](theme)
     - [epic](theme) style
     - [investigation](theme)
+    - I prefer [cyberpunk](theme)
+
 
 - intent: user_choose_difficulty
   examples: |
@@ -392,3 +391,4 @@ nlu:
     - set players to [5](number)
     - solo game
     - [single](number) player
+    - [2](number)
