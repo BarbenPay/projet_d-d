@@ -2,6 +2,8 @@
 # custom Python code.
 
 import os
+import time
+import psutil
 from typing import Any, Text, Dict, List
 from rasa_sdk import Action, Tracker
 from rasa_sdk.events import SlotSet, ActiveLoop
@@ -16,19 +18,21 @@ def get_llm():
         return _llm_instance
 
     print("⏳ Initialisation du chargement du LLM...")
+
+    mem_before = print_memory_usage("Avant chargement du modèle")
     
     try:
         from llama_cpp import Llama
     except ImportError:
-        print("❌ Erreur : llama-cpp-python n'est pas installé.")
+        print("DEBUG: llama-cpp-python n'est pas installé.")
         return None
 
     # --- CHANGEMENT ICI ---
     # On pointe maintenant vers le dossier monté "/app/models"
-    model_path = "/app/models/Llama-3.2-3B-Instruct-Q4_K_M.gguf"
+    model_path = "/app/models/qwen2.5-3b-instruct-q4_k_m.gguf"
 
     if not os.path.exists(model_path):
-        print(f"❌ Erreur : Modèle introuvable à l'emplacement : {model_path}")
+        print(f"DEBUG: Modèle introuvable à l'emplacement : {model_path}")
         # Petit debug pour t'aider si ça plante
         print(f"Contenu de /app/models : {os.listdir('/app/models') if os.path.exists('/app/models') else 'Dossier inexistant'}")
         return None
@@ -37,110 +41,110 @@ def get_llm():
         _llm_instance = Llama(
             model_path=model_path,
             n_ctx=2048,
-            n_threads=4,
+            n_threads=6,
             verbose=False
         )
-        print(f"✅ Modèle chargé avec succès depuis {model_path}")
+
+        mem_after = print_memory_usage("Après chargement du modèle")
+
+        diff = mem_after - mem_before
+
+        print(f"DEBUG: Poids estimé du modèle en RAM : {diff:.2f} MB")
+
+        print(f"DEBUG: Modèle chargé avec succès depuis {model_path}")
         return _llm_instance
     except Exception as e:
-        print(f"❌ Impossible de charger le modèle : {e}")
+        print(f"DEBUG: Impossible de charger le modèle : {e}")
         return None
+    
+
+def print_memory_usage(step_name=""):
+    process = psutil.Process(os.getpid())
+    ram_mb = process.memory_info().rss / 1024 / 1024 
+    print(f"DEBUG: Mémoire consommée par le LLM {step_name} : {ram_mb:.2f} MB utilisés")
+    return ram_mb
 
 dictWeaponPossibilityDependingClass = {
-            "paladin": ["longsword", "hammer", "shield", "mace", "sword"],
-            "barbarian": ["axe", "longsword", "hammer", "mace"],
+            "paladin": ["épée longue", "marteau", "bouclier", "masse", "épée"],
+            "barbare": ["hache", "épée longue", "marteau", "masse"],
             
-            "rogue": ["dagger", "bow", "sword"],
-            "ranger": ["bow", "dagger", "axe", "longsword"],
-            "monk": ["staff", "dagger"],
+            "roublard": ["dague", "arc", "épée"],
+            "rôdeur": ["arc", "dague", "hache", "épée longue"],
+            "moine": ["bâton", "dague"],
 
-            "wizard": ["staff", "orb"],
-            "sorcerer": ["orb", "staff", "dagger"],
-            "druid": ["staff", "mace"],
+            "magicien": ["bâton", "orbe"],
+            "sorcier": ["orbe", "bâton", "dague"],
+            "druide": ["bâton", "masse"],
 
-            "bard": ["luth", "dagger", "sword", "bow"]
+            "barde": ["luth", "dague", "épée", "arc"]
                            }
 
 dictClassAbilities = {
     "paladin": {
-        "name": "Divine Guardian",
-        "desc": "Grants +1 AC to adjacent allies when holding a Shield."
+        "name": "Gardien Divin",
+        "desc": "Confère +1 CA aux alliés adjacents lorsqu'il tient un bouclier."
     },
-    "barbarian": {
-        "name": "Feral Instinct",
-        "desc": "Deals +2 damage when HP is below 50%."
+    "barbare": {
+        "name": "Instinct Feral",
+        "desc": "Inflige +2 dégâts quand les PV sont sous 50%."
     },
-    "rogue": {
-        "name": "Cheap Shot",
-        "desc": "First attack of combat deals bonus damage."
+    "roublard": {
+        "name": "Coup Bas",
+        "desc": "La première attaque du combat inflige des dégâts bonus."
     },
-    "ranger": {
-        "name": "Hunter's Mark",
-        "desc": "Consecutive attacks on the same target deal +2 damage."
+    "rôdeur": {
+        "name": "Marque du Chasseur",
+        "desc": "Les attaques consécutives sur la même cible infligent +2 dégâts."
     },
-    "monk": {
-        "name": "Flow of Ki",
-        "desc": "Successful attacks increase Dodge chance by 10%."
+    "moine": {
+        "name": "Flux de Ki",
+        "desc": "Les attaques réussies augmentent les chances d'esquive de 10%."
     },
-    "wizard": {
-        "name": "Arcane Study",
-        "desc": "Identifies enemy weaknesses using an Orb."
+    "magicien": {
+        "name": "Étude Arcanique",
+        "desc": "Identifie les faiblesses ennemies en utilisant un orbe."
     },
-    "sorcerer": {
-        "name": "Unstable Power",
-        "desc": "Re-roll damage results of 1 on spells."
+    "sorcier": {
+        "name": "Puissance Instable",
+        "desc": "Relance les dés de dégâts affichant 1 pour les sorts."
     },
-    "druid": {
-        "name": "Nature's Touch",
-        "desc": "Passive health regeneration of 2 HP per turn."
+    "druide": {
+        "name": "Toucher de la Nature",
+        "desc": "Régénération passive de 2 PV par tour."
     },
-    "bard": {
-        "name": "Inspiring Tune",
-        "desc": "Allies gain +1 Attack when the Bard holds a Luth."
+    "barde": {
+        "name": "Mélodie Inspirante",
+        "desc": "Les alliés gagnent +1 en Attaque quand le Barde tient un luth."
     }
 }
 
 dictSubraceDependingRace = {
-    "elf" : ["high", "wood"],
-    "dwarf" : ["hill", "mountain"],
-    "gnome" : ["rock", "forest", "cave"],
-    "dragonborn" : ["metallic", "gem", "dragonblood"],
-    "drow" : ["deep", "surface"]
+    "elfe" : ["haut", "bois"],
+    "nain" : ["collines", "montagnes"],
+    "gnome" : ["roches", "forêts", "cavernes"],
+    "drakéide" : ["métallique", "gemme", "sang-dragon"],
+    "drow" : ["profondeurs", "surface"]
 }
 
 dictNaturalAbilityFromSubrace = {
-    "high": "Keen Mind: You know a handy little magic trick (light or small spark).",
-    "wood": "Fleet of Foot: You can move through the forest without making a sound.",
+    "haut": "Esprit Vif : Vous connaissez un petit tour de magie pratique (lumière ou étincelle).",
+    "bois": "Pied Léger : Vous pouvez vous déplacer en forêt sans faire de bruit.",
     
-    "hill": "Dwarven Toughness: You are hardier and can take more hits than others.",
-    "mountain": "Brute Strength: You are accustomed to wearing heavy armor without fatigue.",
+    "collines": "Ténacité Naine : Vous êtes plus robuste et encaissez mieux les coups.",
+    "montagnes": "Force Brute : Vous êtes habitué au port d'armures lourdes sans fatigue.",
 
-    "rock": "Tinker: You know how to repair small mechanical objects or locks.",
-    "forest": "Speak with Small Beasts: Small animals (squirrels, birds) naturally trust you.",
-    "cave": "Superior Darkvision: Your eyes see in total darkness as if it were day.",
+    "roches": "Bricoleur : Vous savez réparer de petits objets mécaniques ou serrures.",
+    "forêts": "Langage des Bêtes : Les petits animaux (écureuils, oiseaux) vous font naturellement confiance.",
+    "cavernes": "Vision des Ténèbres Supérieure : Vos yeux voient dans le noir total comme en plein jour.",
 
-    "deep": "Spider Master: Living in deep caves, spiders are your allies.",
-    "surface": "Light Magic: Living above ground, you create magical lights to guide you.",
+    "profondeurs": "Maître des Araignées : Vivant dans les grottes profondes, les araignées sont vos alliées.",
+    "surface": "Magie Lumineuse : Vivant à la surface, vous créez des lumières magiques pour vous guider.",
 
-    "metallic": "Dragon Breath: You can exhale fire or ice once a day.",
-    "gem": "Telepathy: You can send simple thoughts into the minds of others.",
-    "draconblood": "Royal Presence: People listen to you more attentively thanks to your charisma."
+    "métallique": "Souffle de Dragon : Vous pouvez cracher du feu ou de la glace une fois par jour.",
+    "gemme": "Télépathie : Vous pouvez envoyer des pensées simples dans l'esprit des autres.",
+    "sang-dragon": "Présence Royale : Les gens vous écoutent plus attentivement grâce à votre charisme."
 }
 
-# --- Actions ---
-
-class ActionHelloWorld(Action):
-
-     def name(self) -> Text:
-         return "action_hello_world"
-
-     def run(self, dispatcher: CollectingDispatcher,
-             tracker: Tracker,
-             domain: Dict[Text, Any]) -> List[Dict[Text, Any]]:
-
-         dispatcher.utter_message(text="Hello World!")
-         return []
-     
 class ActionCheckWeapon(Action):
     
     def name(self) -> Text:
@@ -154,14 +158,14 @@ class ActionCheckWeapon(Action):
         player_weapon = tracker.get_slot("weapon")
         
         if not player_class or not player_weapon:
-            dispatcher.utter_message(text="It misses some informations to verify the equipments.")
+            dispatcher.utter_message(text="Il manque des informations pour vérifier l'équipement.")
             return []
         
         if player_weapon not in dictWeaponPossibilityDependingClass.get(player_class):
-            dispatcher.utter_message(text=f"A {player_class} can not pick a {player_weapon} !")
+            dispatcher.utter_message(text=f"Un {player_class} ne peut pas choisir : {player_weapon} !")
             return [SlotSet("weapon", None)]
         else:
-            dispatcher.utter_message(text=f"Alright ! Your {player_class} is stuffed with a {player_weapon}.")
+            dispatcher.utter_message(text=f"Parfait ! Votre {player_class} est équipé avec : {player_weapon}.")
             return []
         
 class ActionAskWeapon(Action):
@@ -180,7 +184,7 @@ class ActionAskWeapon(Action):
         options_display = ", ".join([w.capitalize() for w in weapons])
 
         dispatcher.utter_message(
-            text=f"As a {player_class}, choose your weapon ({options_display}):"
+            text=f"En tant que {player_class}, choisissez votre arme ({options_display}) :"
         )
 
         return []
@@ -197,20 +201,20 @@ class ActionAskSubrace(Action):
         print(f"DEBUG: Race reçue = '{player_race}'")
         
         if not player_race:
-            dispatcher.utter_message(text="Cannot determine your current race.")
+            dispatcher.utter_message(text="Impossible de déterminer votre race actuelle.")
             return []
 
         subraces_list = dictSubraceDependingRace.get(player_race.lower(), [])
         
-        message_text = f"As a {player_race}, choose your legacy:\n\n"
+        message_text = f"En tant que {player_race}, choisissez votre héritage :\n\n"
+        dispatcher.utter_message(text=message_text)
         
         for subrace_key in subraces_list:
-            description = dictNaturalAbilityFromSubrace.get(subrace_key, "Unknown ability")
+            message_text = ""
+            description = dictNaturalAbilityFromSubrace.get(subrace_key, "Capacité inconnue")
             display_title = subrace_key.capitalize()
             message_text += f"🔹 **{display_title}**: {description}\n"
-        
-        # CORRECTION BUG: L'envoi du message manquait ici !
-        dispatcher.utter_message(text=message_text)
+            dispatcher.utter_message(text=message_text)
 
         return []
     
@@ -223,54 +227,16 @@ class ActionAskClassWithAbility(Action):
             tracker: Tracker,
             domain: Dict[Text, Any]) -> List[Dict[Text, Any]]:
 
-        message_text = f"Choose a class from the list below:\n\n"
+        message_text = f"Choisissez une classe dans la liste ci-dessous :\n\n"
+        dispatcher.utter_message(text=message_text)
         
         for class_key, class_data in dictClassAbilities.items():
-            description = class_data.get("desc", "Unknown description")
-            display_title = class_data.get("name", "Unknown name").capitalize()
-            # On affiche tout en texte
+            message_text = ""
+            description = class_data.get("desc", "Description inconnue")
+            display_title = class_data.get("name", "Nom inconnu").capitalize()
             message_text += f"🔹 **{class_key.capitalize()}** ({display_title}): {description}\n"
-
-        dispatcher.utter_message(text=message_text)
-
+            dispatcher.utter_message(text=message_text)
         return []
-    
-    
-class ActionFillAllTheSlot(Action):
-    def name(self) -> Text:
-        return "action_fill_all_the_slot"
-    
-    def run(self, dispatcher: CollectingDispatcher,
-            tracker: Tracker,
-            domain: Dict[Text, Any]) -> List[Dict[Text, Any]]:
-
-        player_class = tracker.get_slot("class")
-        player_subrace = tracker.get_slot("subrace")
-        
-        abilities_found = []
-
-        if player_class:
-            class_key = player_class.lower()
-            class_data = dictClassAbilities.get(class_key)
-            if class_data:
-                ability_str = f"Class Ability ({class_data['name']}): {class_data['desc']}"
-                abilities_found.append(ability_str)
-
-        if player_subrace:
-            subrace_key = player_subrace.lower()
-            subrace_data = dictNaturalAbilityFromSubrace.get(subrace_key)
-            if subrace_data:
-                ability_str = f"Racial Ability: {subrace_data}"
-                abilities_found.append(ability_str)
-
-        if not abilities_found:
-             dispatcher.utter_message(text="I couldn't determine your abilities yet. Please select a class and subrace first.")
-        else:
-             msg = "Abilities updated:\n" + "\n".join([f"- {a}" for a in abilities_found])
-             dispatcher.utter_message(text=msg)
-
-        return [SlotSet("abilities", abilities_found)]
-    
 
 class ActionAskRace(Action):
     def name(self) -> Text:
@@ -281,14 +247,13 @@ class ActionAskRace(Action):
             domain: Dict[Text, Any]) -> List[Dict[Text, Any]]:
 
         available_races = list(dictSubraceDependingRace.keys())
-        if "human" not in available_races:
-             available_races.append("human")
+        if "humain" not in available_races:
+             available_races.append("humain")
 
-        # Affichage texte simple
         races_str = ", ".join([r.capitalize() for r in available_races])
         
         dispatcher.utter_message(
-            text=f"Choose a race for your character ({races_str}):"
+            text=f"Choisissez une race pour votre personnage ({races_str}) :"
         )
 
         return []
@@ -305,11 +270,11 @@ class ValidateCaracterCreationForm(FormValidationAction):
         domain: Dict[Text, Any],
     ) -> List[Text]:
         
-        print("DEBUG: Je force l'ordre des slots via Python !") 
+        print("DEBUG: Ordre forcé pour le form sinon ça demande par ordre alphabétique") 
         return ["race", "subrace", "class", "weapon", "attribute"]
     
     def validate_race(self, slot_value: Any, dispatcher: CollectingDispatcher, tracker: Tracker, domain: Dict[Text, Any]) -> Dict[Text, Any]:
-        available = list(dictSubraceDependingRace.keys()) + ["human"]
+        available = list(dictSubraceDependingRace.keys()) + ["humain"]
         if slot_value.lower() not in available:
             dispatcher.utter_message(text=f"Race inconnue. Choix: {', '.join(available)}")
             return {"race": None}
@@ -317,9 +282,8 @@ class ValidateCaracterCreationForm(FormValidationAction):
 
     def validate_subrace(self, slot_value: Any, dispatcher: CollectingDispatcher, tracker: Tracker, domain: Dict[Text, Any]) -> Dict[Text, Any]:
         race = tracker.get_slot("race")
-        # Gestion des humains ou races sans sous-race
-        if race == "human":
-             return {"subrace": "None", "ability_subrace": "Versatile: +1 to all stats."}
+        if race == "humain":
+             return {"subrace": "None", "ability_subrace": "Polyvalent : +1 à toutes les statistiques."}
              
         valid = dictSubraceDependingRace.get(race, [])
         if slot_value.lower() not in valid and valid:
@@ -351,7 +315,6 @@ class ValidateCaracterCreationForm(FormValidationAction):
         return {"weapon": slot_value}
 
     def validate_attribute(self, slot_value: Any, dispatcher: CollectingDispatcher, tracker: Tracker, domain: Dict[Text, Any]) -> Dict[Text, Any]:
-        # Validation simple (accepte tout tant que ce n'est pas vide)
         if len(slot_value) < 2:
             dispatcher.utter_message(text="Attribut invalide.")
             return {"attribute": None}
@@ -370,40 +333,35 @@ class ValidateAdventureForm(FormValidationAction):
         domain: Dict[Text, Any],
     ) -> Dict[Text, Any]:
 
-        # 1. Récupération du LLM via la fonction (qui le charge si besoin)
         llm = get_llm()
 
         if llm is None:
             dispatcher.utter_message(text="[Système] Le Narrateur n'est pas connecté (Erreur chargement modèle).")
-            # Astuce : On laisse adventure_text à None pour rester dans la boucle même en cas d'erreur
             return {"adventure_text": None}
         
+        print("DEBUG: Lancement du llm")
+
+
 
         theme = tracker.get_slot("theme") or "Médiéval Fantastique"
         difficulty = tracker.get_slot("difficulty") or "Normale"
-        nb_players = tracker.get_slot("nb_players") or "1"
-        language = tracker.get_slot("language") or "Français"
         
-        # Fiche personnage
         p_race = tracker.get_slot("race") or "Inconnu"
         p_subrace = tracker.get_slot("subrace") or ""
         p_class = tracker.get_slot("class") or "Aventurier"
         p_weapon = tracker.get_slot("weapon") or "Mains nues"
         p_attribute = tracker.get_slot("attribute") or "Aucun"
-        # On essaie de récupérer les capacités si le slot existe, sinon chaîne vide
-        p_abilities = tracker.get_slot("abilities") 
+        p_abilities = tracker.get_slot("ability_class") + tracker.get_slot("ability_subrace")
         if isinstance(p_abilities, list):
             p_abilities = ", ".join(p_abilities)
         
-        # 3. Construction du Prompt Système (Le "Cerveau" du DM)
-        # On lui donne toutes les billes pour qu'il soit cohérent.
         system_prompt = (
             f"Tu es un Maître du Donjon (MJ) expert pour un jeu de rôle textuel. \n"
-            f"LANGUE DE RÉPONSE: {language}. \n\n"
+            f"LANGUE DE RÉPONSE: Français. \n\n"
             f"--- PARAMÈTRES DE LA PARTIE ---\n"
             f"Thème: {theme}\n"
             f"Difficulté: {difficulty}\n"
-            f"Nombre de joueurs: {nb_players}\n\n"
+            f"Nombre de joueurs: 1\n\n"
             f"--- FICHE PERSONNAGE ---\n"
             f"Race: {p_race} ({p_subrace})\n"
             f"Classe: {p_class}\n"
@@ -417,12 +375,8 @@ class ValidateAdventureForm(FormValidationAction):
             f"4. Ne joue jamais à la place du joueur. Demande-lui ce qu'il fait ensuite."
         )
 
-        # 4. Fenêtre Glissante (Sliding Window) de l'historique
-        # On récupère les événements, on filtre pour n'avoir que User et Bot
         events = [e for e in tracker.events if e['event'] in ['user', 'bot']]
         
-        # On garde les 10 derniers échanges (donc 20 messages max : 10 users + 10 bots)
-        # On exclut le tout dernier message utilisateur car il sera ajouté juste après dans le prompt
         past_events = events[:-1][-20:] 
 
         history_text = ""
@@ -430,13 +384,12 @@ class ValidateAdventureForm(FormValidationAction):
             if event['event'] == 'user' and event.get('text'):
                 history_text += f"<|start_header_id|>user<|end_header_id|>\n\n{event.get('text')}<|eot_id|>"
             elif event['event'] == 'bot' and event.get('text'):
-                # On évite de remettre les messages techniques de Rasa s'il y en a
                 history_text += f"<|start_header_id|>assistant<|end_header_id|>\n\n{event.get('text')}<|eot_id|>"
 
-        # 5. Message actuel de l'utilisateur
+        print(f"DEBUG: HISTORIQUE DE LA CONVERSATION : \n" + history_text)
+
         current_message = slot_value
 
-        # 6. Assemblage du Prompt Final (Format Llama 3)
         full_prompt = (
             f"<|begin_of_text|><|start_header_id|>system<|end_header_id|>\n\n"
             f"{system_prompt}<|eot_id|>\n"
@@ -446,25 +399,31 @@ class ValidateAdventureForm(FormValidationAction):
             f"<|start_header_id|>assistant<|end_header_id|>\n\n"
         )
 
-        print("DEBUG: Envoi au LLM...") # Utile pour voir si ça bloque
+        print("DEBUG: Envoi au LLM...")
         
         try:
+            start_time = time.time()
             output = llm(
                 full_prompt,
-                max_tokens=400,       # Un peu plus de place pour la narration
-                stop=["<|eot_id|>", "<|start_header_id|>"], # Stop tokens stricts pour Llama 3
+                max_tokens=450,
+                stop=["<|eot_id|>", "<|start_header_id|>"],
                 echo=False,
-                temperature=0.7,      # Créatif mais pas délirant
+                temperature=0.8,
                 top_p=0.9
             )
+
+            end_time = time.time()
+
+            duration = end_time - start_time
+
+            print(f"DEBUG: Génération terminée en {duration:.2f} secondes.")
+
             response_text = output['choices'][0]['text'].strip()
             
-            # Envoi de la réponse au joueur
             dispatcher.utter_message(text=response_text)
             
         except Exception as e:
             print(f"ERREUR LLM : {e}")
             dispatcher.utter_message(text="Une perturbation magique brouille les sens du Maître du Donjon... (Erreur technique)")
 
-        # 7. IMPORTANT : Reset du slot pour la boucle infinie
         return {"adventure_text": None}
