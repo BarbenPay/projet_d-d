@@ -38,3 +38,8 @@ rules:
   - intent: user_choose_reset   # Seul cet intent peut casser la boucle grâce au 'not_intent' du domain
   - action: action_deactivate_loop
   - active_loop: null
+
+- rule: Aide contextuelle
+  steps:
+  - intent: user_ask_help
+  - action: action_give_help

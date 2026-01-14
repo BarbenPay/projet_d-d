@@ -142,6 +142,7 @@ responses:
   utter_ask_attribute:
   - text: What represents your character best? (Strength, Intelligence, Charisma...)
 actions:
+- action_give_help
 - action_ask_subrace
 - action_ask_weapon
 - action_ask_class

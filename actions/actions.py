@@ -468,3 +468,220 @@ class ValidateAdventureForm(FormValidationAction):
 
         # 7. IMPORTANT : Reset du slot pour la boucle infinie
         return {"adventure_text": None}
+    
+class ActionGiveHelp(Action):
+    def name(self) -> Text:
+        return "action_give_help"
+
+    def run(
+        self,
+        dispatcher: CollectingDispatcher,
+        tracker: Tracker,
+        domain: Dict[Text, Any],
+    ) -> List[Dict[Text, Any]]:
+
+        def pretty_list(items: List[str]) -> str:
+            return ", ".join([str(s) for s in items])
+
+        # 1) Contexte le plus fiable pendant un form
+        expected = tracker.get_slot("requested_slot")
+
+        # 2) Fallback si requested_slot est vide : deviner depuis la derniÃ¨re action
+        if not expected:
+            last_action = None
+            for e in reversed(tracker.events):
+                if e.get("event") == "action":
+                    last_action = e.get("name")
+                    break
+
+            mapping = {
+                "utter_ask_theme": "theme",
+                "utter_ask_difficulty": "difficulty",
+                "utter_ask_nb_players": "nb_players",
+                "utter_ask_race": "race",
+                "utter_ask_subrace": "subrace",
+                "utter_ask_class": "class",
+                "utter_ask_weapon": "weapon",
+                "utter_ask_attribute": "attribute",
+                "utter_ask_adventure_text": "adventure_text",
+            }
+            expected = mapping.get(last_action)
+
+        # --- Aide contextuelle ---
+        if expected == "race":
+            races = sorted(list(dictSubraceDependingRace.keys()))
+            if "human" not in races:
+                races.append("human")
+                races = sorted(races)
+
+            dispatcher.utter_message(
+                text=(
+                    "A cette etape, je te demande de choisir la race de ton personnage.\n"
+                    f"Choix possibles : {pretty_list(races)}.\n"
+                    "Exemple : elf"
+                )
+            )
+            return []
+
+        if expected == "subrace":
+            race = (tracker.get_slot("race") or "").lower()
+
+            if not race:
+                dispatcher.utter_message(
+                    text=(
+                        "A cette etape, je te demande une sous-race, mais je n'ai pas encore ta race.\n"
+                        "Choisis d'abord une race (elf, dwarf, human, drow, gnome, dragonborn), puis je te donnerai les sous-races possibles."
+                    )
+                )
+                return []
+
+            if race == "human":
+                dispatcher.utter_message(
+                    text=(
+                        "Pour la race human, il n'y a pas de sous-race dans ce scenario.\n"
+                        "Tu peux repondre : none"
+                    )
+                )
+                return []
+
+            subs = dictSubraceDependingRace.get(race, [])
+            if not subs:
+                dispatcher.utter_message(
+                    text=(
+                        f"Je n'ai pas de sous-races enregistrees pour : {race}.\n"
+                        "Tu peux repondre : none, ou changer de race."
+                    )
+                )
+                return []
+
+            lines = []
+            for s in subs:
+                cap = dictNaturalAbilityFromSubrace.get(s, "Aucune capacite connue.")
+                lines.append(f"- {s} : {cap}")
+
+            dispatcher.utter_message(
+                text=(
+                    f"A cette etape, je te demande la sous-race pour : {race}.\n"
+                    "Choix possibles :\n"
+                    + "\n".join(lines)
+                    + "\nExemple : high"
+                )
+            )
+            return []
+
+        if expected == "class":
+            classes = sorted(list(dictClassAbilities.keys()))
+            lines = []
+            for ck in classes:
+                desc = dictClassAbilities.get(ck, {}).get("desc", "")
+                lines.append(f"- {ck} : {desc}")
+
+            dispatcher.utter_message(
+                text=(
+                    "A cette etape, je te demande de choisir la classe.\n"
+                    f"Choix possibles : {pretty_list(classes)}.\n\n"
+                    "Details :\n"
+                    + "\n".join(lines)
+                    + "\n\nExemple : wizard"
+                )
+            )
+            return []
+
+        if expected == "weapon":
+            p_class = (tracker.get_slot("class") or "").lower()
+
+            if not p_class:
+                dispatcher.utter_message(
+                    text=(
+                        "A cette etape, je te demande une arme, mais je n'ai pas encore ta classe.\n"
+                        "Choisis d'abord une classe (wizard, rogue, paladin, barbarian, ranger, monk, sorcerer, druid, bard), puis je te donnerai toutes les armes autorisees."
+                    )
+                )
+                return []
+
+            allowed = dictWeaponPossibilityDependingClass.get(p_class, [])
+            if not allowed:
+                dispatcher.utter_message(
+                    text=(
+                        f"Je n'ai pas de liste d'armes pour la classe : {p_class}."
+                    )
+                )
+                return []
+
+            dispatcher.utter_message(
+                text=(
+                    f"A cette etape, je te demande de choisir une arme pour la classe : {p_class}.\n"
+                    f"Choix possibles : {pretty_list(allowed)}.\n"
+                    "Exemple : staff"
+                )
+            )
+            return []
+
+        if expected == "attribute":
+            # Liste complÃ¨te basÃ©e sur ton lookup nlu.yml
+            attributes = [
+                "strength", "dexterity", "constitution", "intelligence", "wisdom", "charisma",
+                "power", "agility", "stamina", "magic"
+            ]
+            dispatcher.utter_message(
+                text=(
+                    "A cette etape, je te demande ton attribut principal.\n"
+                    f"Choix possibles : {pretty_list(attributes)}.\n"
+                    "Exemple : strength"
+                )
+            )
+            return []
+
+        if expected == "theme":
+            # Liste complÃ¨te basÃ©e sur ton lookup nlu.yml
+            themes = [
+                "fantasy", "dark fantasy", "horror", "comedy", "epic",
+                "investigation", "mystery", "dungeon crawler", "cyberpunk", "steampunk"
+            ]
+            dispatcher.utter_message(
+                text=(
+                    "A cette etape, je te demande le theme de l'aventure.\n"
+                    f"Choix possibles : {pretty_list(themes)}.\n"
+                    "Exemple : dark fantasy"
+                )
+            )
+            return []
+
+        if expected == "difficulty":
+            # Liste complÃ¨te basÃ©e sur ton lookup nlu.yml
+            difficulties = ["easy", "normal", "hard", "expert", "nightmare", "beginner"]
+            dispatcher.utter_message(
+                text=(
+                    "A cette etape, je te demande la difficulte.\n"
+                    f"Choix possibles : {pretty_list(difficulties)}.\n"
+                    "Exemple : normal"
+                )
+            )
+            return []
+
+        if expected in ("nb_players", "number", "players"):
+            dispatcher.utter_message(
+                text=(
+                    "A cette etape, je te demande le nombre de joueurs.\n"
+                    "Reponds par un entier : 1, 2, 3, 4, 5..."
+                )
+            )
+            return []
+
+        if expected == "adventure_text":
+            dispatcher.utter_message(
+                text=(
+                    "A cette etape, tu es en mode aventure.\n"
+                    "Decris simplement ce que tu fais (une phrase courte suffit).\n"
+                    "Exemples : j'explore la piece / j'ouvre la porte / j'attaque le gobelin / je me cache"
+                )
+            )
+            return []
+
+        dispatcher.utter_message(
+            text=(
+                "Je peux t'aider, mais je n'arrive pas a identifier l'etape actuelle.\n"
+                "Dis-moi si tu es en train de choisir : theme, difficulte, nombre de joueurs, race, sous-race, classe, arme, attribut."
+            )
+        )
+        return []
