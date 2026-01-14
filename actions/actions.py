@@ -369,3 +369,27 @@ class askLLM(Action):
         dispatcher.utter_message(text=response_text)
 
         return []
+
+class ActionSyncAccessibility(Action):
+    def name(self) -> Text:
+        return "action_sync_accessibility"
+
+    def run(self, dispatcher: CollectingDispatcher,
+            tracker: Tracker,
+            domain: Dict[Text, Any]) -> List[Dict[Text, Any]]:
+
+        access_slot = tracker.get_slot("accessibility")
+        
+        mode = "text" # Par défaut
+        if access_slot:
+            val = access_slot.lower()
+            if "audio" in val or "voice" in val or "voix" in val:
+                mode = "audio"
+            else:
+                mode = "text"
+
+        dispatcher.utter_message(custom={"set_mode": mode})
+        
+        dispatcher.utter_message(text=f"Mode client mis à jour vers : {mode.upper()}")
+
+        return []
