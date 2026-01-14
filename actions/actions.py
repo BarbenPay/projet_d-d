@@ -4,9 +4,10 @@
 import os
 from typing import Any, Text, Dict, List
 from rasa_sdk import Action, Tracker
-from rasa_sdk.events import SlotSet, ActiveLoop
+from rasa_sdk.events import SlotSet, ActiveLoop, UserUtteranceReverted, FollowupAction
 from rasa_sdk.executor import CollectingDispatcher
 from rasa_sdk.forms import FormValidationAction
+
 
 _llm_instance = None
 
@@ -468,3 +469,44 @@ class ValidateAdventureForm(FormValidationAction):
 
         # 7. IMPORTANT : Reset du slot pour la boucle infinie
         return {"adventure_text": None}
+
+class ActionSmartUndo(Action):
+
+    def name(self) -> Text:
+        return "action_undo"
+
+    def get_last_modified_slot(self, tracker: Tracker) -> Text:
+        """
+        Parcourt l'historique à l'envers pour trouver le dernier slot rempli par l'utilisateur.
+        """
+        for event in reversed(tracker.events):
+            if event.get("event") == "slot" and event.get("value") is not None:
+                slot_name = event.get("name")
+                
+                if slot_name != "requested_slot":
+                    return slot_name
+        return None
+
+    def run(self, dispatcher: CollectingDispatcher,
+            tracker: Tracker,
+            domain: Dict[Text, Any]) -> List[Dict[Text, Any]]:
+
+        active_loop = tracker.active_loop.get('name') if tracker.active_loop else None
+
+        if active_loop:
+            last_slot_name = self.get_last_modified_slot(tracker)
+
+            if last_slot_name:
+                dispatcher.utter_message(text=f"D'accord, j'efface votre choix pour '{last_slot_name}'.")
+                
+                return [
+                    SlotSet(last_slot_name, None),
+                    FollowupAction(active_loop) 
+                ]
+            else:
+                dispatcher.utter_message(text="Je ne trouve rien à annuler dans ce formulaire.")
+                return []
+
+        else:
+            dispatcher.utter_message(text="Retour en arrière...")
+            return [UserUtteranceReverted(), UserUtteranceReverted()]

@@ -31,6 +31,8 @@ intents:
     use_entities: true
 - user_choose_attribute:
     use_entities: true
+- undo:
+    use_entities: true
 entities:
 - accessibility
 - theme
@@ -146,6 +148,7 @@ actions:
 - action_ask_weapon
 - action_ask_class
 - action_ask_race
+- action_undo
 - validate_caracter_creation_form
 - validate_adventure_form
 forms:
@@ -177,6 +180,8 @@ forms:
   adventure_form:
     required_slots:
       adventure_text:
-      - not_intent: user_choose_reset
+      - not_intent:
+        - user_choose_reset
+        - undo
         type: from_text
 e2e_actions: []

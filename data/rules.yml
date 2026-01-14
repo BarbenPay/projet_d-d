@@ -2,39 +2,28 @@ version: "2.0"
 
 rules:
 
-# --- Règle pour interrompre les settings du jeu ---
-- rule: Interruption game settings
+- rule: Undo inside Game Settings
   condition:
-  - active_loop: game_settings_form  # On nomme explicitement le form (String)
+  - active_loop: game_settings_form
   steps:
-  - intent: user_choose_reset      # "Stop", "Annuler"
-  - action: action_deactivate_loop # On tue la loop
-  - active_loop: null              # On confirme qu'elle est morte
-  - action: utter_confirm_settings_game # Optionnel : retour au menu précédent
+  - intent: undo
+  - action: action_undo
 
-# --- Règle pour interrompre la création de perso ---
-- rule: Interruption character creation
+- rule: Undo inside Character Creation
   condition:
-  - active_loop: caracter_creation_form # On nomme explicitement le form (String)
+  - active_loop: caracter_creation_form
   steps:
-  - intent: user_choose_reset
-  - action: action_deactivate_loop
-  - active_loop: null
-  - action: utter_confirm_story # Optionnel : retour au menu 
-  
-- rule: Start Adventure Loop
-  steps:
-  - action: caracter_creation_form
-  - active_loop: null
-  - action: utter_confirm_character
-  - intent: affirm
-  - action: adventure_form      # On lance le formulaire d'aventure
-  - active_loop: adventure_form # On confirme qu'il est actif
+  - intent: undo
+  - action: action_undo
 
-- rule: Stop Adventure Loop (Reset)
+- rule: Undo inside Adventure
   condition:
   - active_loop: adventure_form
   steps:
-  - intent: user_choose_reset   # Seul cet intent peut casser la boucle grâce au 'not_intent' du domain
-  - action: action_deactivate_loop
-  - active_loop: null
+  - intent: undo
+  - action: action_undo
+
+- rule: Undo Generic
+  steps:
+  - intent: undo
+  - action: action_undo

@@ -1,7 +1,7 @@
 version: "2.0"
 stories:
 
-- story: Happy path complet (Jeu -> Story -> Perso)
+- story: Happy path complet
   steps:
   - intent: start_game
   - action: utter_accessibility_selection
@@ -24,13 +24,13 @@ stories:
   - action: adventure_form
   - active_loop: adventure_form
 
-- story: Correction  Retour à la langue depuis accessibilité
+- story: Retour à la langue depuis accessibilité
   steps:
   - action: utter_accessibility_selection
   - intent: user_choose_reset
   - action: utter_accessibility_selection
 
-- story: Correction  Refus des settings du jeu (Langue/Accessibilité)
+- story: Refus des settings du jeu (Langue/Accessibilité)
   steps:
   - action: utter_confirm_settings_game
   - intent: deny
