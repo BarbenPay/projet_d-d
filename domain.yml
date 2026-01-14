@@ -109,9 +109,19 @@ slots:
     auto_fill: true
     influence_conversation: true
   adventure_text:
-    type: text
+    type: rasa.shared.core.slots.TextSlot
     initial_value: null
     auto_fill: false
+    influence_conversation: false
+  ability_class:
+    type: rasa.shared.core.slots.TextSlot
+    initial_value: Aucune
+    auto_fill: true
+    influence_conversation: false
+  ability_subrace:
+    type: rasa.shared.core.slots.TextSlot
+    initial_value: Aucune
+    auto_fill: true
     influence_conversation: false
 responses:
   utter_greet:
@@ -160,7 +170,9 @@ responses:
 
       Does everything look good?
   utter_ask_adventure_text:
-  - text: "Que faites-vous ?"
+  - text: Que faites-vous ?
+  utter_ask_attribute:
+  - text: What represents your character best? (Strength, Intelligence, Charisma...)
 actions:
 - utter_ask_subrace
 - utter_ask_weapon
@@ -170,6 +182,8 @@ actions:
 - action_ask_weapon
 - action_ask_class
 - action_ask_race
+- validate_caracter_creation_form
+- validate_adventure_form
 forms:
   game_settings_form:
     required_slots:
@@ -184,6 +198,9 @@ forms:
         type: from_entity
   caracter_creation_form:
     required_slots:
+      attribute:
+      - entity: attribute
+        type: from_entity
       class:
       - entity: class
         type: from_entity
@@ -199,6 +216,6 @@ forms:
   adventure_form:
     required_slots:
       adventure_text:
-      - type: from_text
-        not_intent: user_choose_reset
+      - not_intent: user_choose_reset
+        type: from_text
 e2e_actions: []

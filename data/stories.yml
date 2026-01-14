@@ -22,7 +22,9 @@ stories:
   - active_loop: null
   - action: utter_confirm_character
   - intent: affirm
-#  - action: utter_start_adventure
+  
+  - action: adventure_form
+  - active_loop: adventure_form
 
 - story: Correction  Retour à la langue depuis accessibilité
   steps:

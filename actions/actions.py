@@ -1,36 +1,50 @@
 # This files contains your custom actions which can be used to run
 # custom Python code.
 
+import os
 from typing import Any, Text, Dict, List
 from rasa_sdk import Action, Tracker
 from rasa_sdk.events import SlotSet, ActiveLoop
 from rasa_sdk.executor import CollectingDispatcher
 from rasa_sdk.forms import FormValidationAction
 
-# --- Chargement du LLM (Optionnel) ---
-try:
-    from llama_cpp import Llama
-    print("Librairie llama-cpp-python chargée avec succès.")
-except ImportError:
-    print("Erreur: llama-cpp-python n'est pas installé.")
-    Llama = None
-    
-MODEL_PATH = "./models/Meta-Llama-3.1-8B-Instruct-Q3_K_M.gguf"
+_llm_instance = None
 
-llm = None
-if Llama:
+def get_llm():
+    global _llm_instance
+    if _llm_instance is not None:
+        return _llm_instance
+
+    print("⏳ Initialisation du chargement du LLM...")
+    
     try:
-        llm = Llama(
-            model_path=MODEL_PATH,
+        from llama_cpp import Llama
+    except ImportError:
+        print("❌ Erreur : llama-cpp-python n'est pas installé.")
+        return None
+
+    # --- CHANGEMENT ICI ---
+    # On pointe maintenant vers le dossier monté "/app/models"
+    model_path = "/app/models/Llama-3.2-3B-Instruct-Q4_K_M.gguf"
+
+    if not os.path.exists(model_path):
+        print(f"❌ Erreur : Modèle introuvable à l'emplacement : {model_path}")
+        # Petit debug pour t'aider si ça plante
+        print(f"Contenu de /app/models : {os.listdir('/app/models') if os.path.exists('/app/models') else 'Dossier inexistant'}")
+        return None
+
+    try:
+        _llm_instance = Llama(
+            model_path=model_path,
             n_ctx=2048,
             n_threads=4,
             verbose=False
         )
-        print(f"Modèle chargé depuis {MODEL_PATH}")
+        print(f"✅ Modèle chargé avec succès depuis {model_path}")
+        return _llm_instance
     except Exception as e:
-        print(f"Impossible de charger le modèle : {e}")
-
-# --- Données du jeu ---
+        print(f"❌ Impossible de charger le modèle : {e}")
+        return None
 
 dictWeaponPossibilityDependingClass = {
             "paladin": ["longsword", "hammer", "shield", "mace", "sword"],
@@ -283,7 +297,7 @@ class ValidateCaracterCreationForm(FormValidationAction):
     def name(self) -> Text:
         return "validate_caracter_creation_form"
 
-    def required_slots(
+    async def required_slots(
         self,
         domain_slots: List[Text],
         dispatcher: CollectingDispatcher,
@@ -292,14 +306,63 @@ class ValidateCaracterCreationForm(FormValidationAction):
     ) -> List[Text]:
         
         print("DEBUG: Je force l'ordre des slots via Python !") 
-        return ["race", "subrace", "class", "weapon"]
+        return ["race", "subrace", "class", "weapon", "attribute"]
+    
+    def validate_race(self, slot_value: Any, dispatcher: CollectingDispatcher, tracker: Tracker, domain: Dict[Text, Any]) -> Dict[Text, Any]:
+        available = list(dictSubraceDependingRace.keys()) + ["human"]
+        if slot_value.lower() not in available:
+            dispatcher.utter_message(text=f"Race inconnue. Choix: {', '.join(available)}")
+            return {"race": None}
+        return {"race": slot_value}
+
+    def validate_subrace(self, slot_value: Any, dispatcher: CollectingDispatcher, tracker: Tracker, domain: Dict[Text, Any]) -> Dict[Text, Any]:
+        race = tracker.get_slot("race")
+        # Gestion des humains ou races sans sous-race
+        if race == "human":
+             return {"subrace": "None", "ability_subrace": "Versatile: +1 to all stats."}
+             
+        valid = dictSubraceDependingRace.get(race, [])
+        if slot_value.lower() not in valid and valid:
+            dispatcher.utter_message(text=f"Choix impossibles pour {race}. Essayez: {', '.join(valid)}")
+            return {"subrace": None}
+            
+        # AUTOMATISATION : On récupère la capacité ici
+        ability = dictNaturalAbilityFromSubrace.get(slot_value.lower(), "Aucune")
+        
+        return {"subrace": slot_value, "ability_subrace": ability}
+
+    def validate_class(self, slot_value: Any, dispatcher: CollectingDispatcher, tracker: Tracker, domain: Dict[Text, Any]) -> Dict[Text, Any]:
+        if slot_value.lower() not in dictClassAbilities:
+            dispatcher.utter_message(text="Classe inconnue.")
+            return {"class": None}
+        
+        # AUTOMATISATION : On récupère la capacité de classe ici
+        info = dictClassAbilities.get(slot_value.lower())
+        ability = f"{info['name']}: {info['desc']}"
+        
+        return {"class": slot_value, "ability_class": ability}
+    
+    def validate_weapon(self, slot_value: Any, dispatcher: CollectingDispatcher, tracker: Tracker, domain: Dict[Text, Any]) -> Dict[Text, Any]:
+        p_class = tracker.get_slot("class")
+        allowed = dictWeaponPossibilityDependingClass.get(p_class, [])
+        if slot_value.lower() not in allowed and allowed:
+            dispatcher.utter_message(text=f"Un {p_class} ne peut pas utiliser {slot_value}. Choix: {', '.join(allowed)}")
+            return {"weapon": None}
+        return {"weapon": slot_value}
+
+    def validate_attribute(self, slot_value: Any, dispatcher: CollectingDispatcher, tracker: Tracker, domain: Dict[Text, Any]) -> Dict[Text, Any]:
+        # Validation simple (accepte tout tant que ce n'est pas vide)
+        if len(slot_value) < 2:
+            dispatcher.utter_message(text="Attribut invalide.")
+            return {"attribute": None}
+        return {"attribute": slot_value}
         
     
 class ValidateAdventureForm(FormValidationAction):
     def name(self) -> Text:
         return "validate_adventure_form"
 
-    def validate_adventure_text(
+    async def validate_adventure_text(
         self,
         slot_value: Any,
         dispatcher: CollectingDispatcher,
@@ -307,13 +370,15 @@ class ValidateAdventureForm(FormValidationAction):
         domain: Dict[Text, Any],
     ) -> Dict[Text, Any]:
 
-        # 1. Vérification du LLM
-        if 'llm' not in globals() or llm is None:
-            dispatcher.utter_message(text="[Système] Le Narrateur n'est pas connecté.")
-            return {"adventure_text": None}
+        # 1. Récupération du LLM via la fonction (qui le charge si besoin)
+        llm = get_llm()
 
-        # 2. Récupération de TOUS les slots pertinents
-        # Settings du jeu
+        if llm is None:
+            dispatcher.utter_message(text="[Système] Le Narrateur n'est pas connecté (Erreur chargement modèle).")
+            # Astuce : On laisse adventure_text à None pour rester dans la boucle même en cas d'erreur
+            return {"adventure_text": None}
+        
+
         theme = tracker.get_slot("theme") or "Médiéval Fantastique"
         difficulty = tracker.get_slot("difficulty") or "Normale"
         nb_players = tracker.get_slot("nb_players") or "1"
