@@ -31,6 +31,8 @@ intents:
     use_entities: true
 - user_choose_attribute:
     use_entities: true
+- nlu_fallback:
+    use_entities: true
 entities:
 - accessibility
 - theme
@@ -99,56 +101,60 @@ slots:
     influence_conversation: false
 responses:
   utter_greet:
-  - text: Hello adventurer! Ready to create your character?
+  - text: Bonjour aventurier ! prêt a jouer ?
   utter_accessibility_selection:
-  - text: 'How would you like to play the game: text-based or voice-based?'
+  - text: 'Comment voulez-vous jouer : à l oral ou à l écrit ?'
   utter_confirm_settings_game:
   - text: |
-      Here is your game configuration:
-      - Accessibility : {accessibility}
+      Voici votre configuration de partie:
+      - Accessibilité : {accessibility}
 
-      Does everything look good?
+      Est-ce que cela vous convient ?
   utter_start_story_settings:
-  - text: Great! Let's start choosing your story settings.
+  - text: Parfait ! Commencons par choisir les paramètres de votre histoire.
   utter_ask_theme:
-  - text: What theme do you want for the adventure (dark fantasy, high fantasy, steampunk...)?
+  - text: Quel thème voulez vous pour votre aventure (medevial, cyberpunk, fantaisie, ...)?
   utter_ask_difficulty:
-  - text: Choose a difficulty (easy, normal, hard).
+  - text: Choisissez une difficulté (facile, normal, difficile, ...).
   utter_confirm_story:
   - text: |
-      Here is your storie configuration:
-      - Theme : {theme}
-      - Difficulty : {difficulty}
+      Voici la configuration de l'histoire:
+      - Thème : {theme}
+      - Difficulté : {difficulty}
 
-      Does everything look good?
+      Est-ce que cela vous convient ?
   utter_start_creation_character:
-  - text: Great! Let's start creating your character.
+  - text: Parfait ! Commencons par créer votre personnage.
   utter_ask_race:
-  - text: Choose a race (elf, dwarf, human, drow, gnome, dragonborn).
+  - text: Choisissez une race (elf, nain, humain, drow, gnome, drakéide).
   utter_ask_class:
-  - text: Choose a class (paladin, rogue, wizard, druid, monk, barbarian, bard, ranger, sorcerer).
+  - text: Choisissez une classe (paladin, roublard, sorcier, druide, moine, barbare, barde, roder, magicien).
   utter_confirm_character:
   - text: |
-      Here is your character:
+      Voici votre personnage :
       - Race: {race}
-      - Subrace: {subrace}
-      - Class: {class}
-      - Weapon: {weapon}
-      - Attribute {attribute}
+      - Sous-race: {subrace}
+      - Classe: {class}
+      - Armes: {weapon}
+      - Attributs {attribute}
 
-      Does everything look good?
+      Est-ce que cela vous convient ?
   utter_ask_adventure_text:
   - text: Que faites-vous ?
   utter_ask_attribute:
-  - text: What represents your character best? (Strength, Intelligence, Charisma...)
+  - text: Qu'est ce qui représente le mieux votre personnage ? (Force, Intelligence, Charisme, ...)
+  utter_ask_rephrase:
+  - text: Je n'ai pas bien compris. Peux-tu reformuler ?
+  utter_default:
+  - text: Désolé, je ne comprends vraiment pas ce que tu veux dire.
 actions:
-- action_give_help
 - action_ask_subrace
 - action_ask_weapon
 - action_ask_class
 - action_ask_race
 - validate_caracter_creation_form
 - validate_adventure_form
+
 forms:
   game_settings_form:
     required_slots:
