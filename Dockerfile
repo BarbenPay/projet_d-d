@@ -8,6 +8,6 @@ RUN apt-get update && \
     apt-get install -y build-essential cmake && \
     rm -rf /var/lib/apt/lists/*
 
-RUN pip install --no-cache-dir llama-cpp-python
+RUN pip install --no-cache-dir llama-cpp-python psutil
 
 USER 1001

@@ -368,35 +368,47 @@ class ValidateAdventureForm(FormValidationAction):
             f"Arme principale: {p_weapon}\n"
             f"Attribut majeur: {p_attribute}\n"
             f"Capacités spéciales: {p_abilities}\n\n"
+            f"PV du personnage: 20"
             f"--- INSTRUCTIONS ---\n"
             f"1. Tu dois décrire l'action, l'environnement et les réactions des PNJ de manière immersive.\n"
             f"2. Prends en compte la difficulté ({difficulty}) pour décider si les actions du joueur réussissent ou échouent.\n"
-            f"3. Sois concis : Ne fais pas de monologues trop longs (max 3-4 phrases).\n"
-            f"4. Ne joue jamais à la place du joueur. Demande-lui ce qu'il fait ensuite."
+            f"3. Sois concis : Ne fais pas de monologues trop longs (max 5-6 phrases).\n"
+            f"4. Ne joue JAMAIS à la place du joueur. C'est le joueur qui prend des décision dans son histoire pas toi. \n"
+            f"Tu attendras toujours une décision du joueur mais tu ne demandera jamais au joueur ce qu'il veut faire. \n"
+            f"Par exemple lors d'une action importante comme un combat tu passeras en mode tour par tour en demandant à chaque fois à l'utilisateur ce qu'il veut faire."
         )
 
-        events = [e for e in tracker.events if e['event'] in ['user', 'bot']]
+        start_index = 0
+        all_events = tracker.events
         
-        past_events = events[:-1][-20:] 
+        for i, event in enumerate(reversed(all_events)):
+            if event.get("event") == "active_loop" and event.get("name") == "adventure_form":
+                start_index = len(all_events) - i - 1
+                break
+        
+        adventure_only_events = all_events[start_index:]
+
+        events = [e for e in adventure_only_events if e['event'] in ['user', 'bot']]
+        
+        past_events = events[:-1][-20:]
+
 
         history_text = ""
         for event in past_events:
             if event['event'] == 'user' and event.get('text'):
-                history_text += f"<|start_header_id|>user<|end_header_id|>\n\n{event.get('text')}<|eot_id|>"
+                history_text += f"<|im_start|>user\n{event.get('text')}<|im_end|>\n"
             elif event['event'] == 'bot' and event.get('text'):
-                history_text += f"<|start_header_id|>assistant<|end_header_id|>\n\n{event.get('text')}<|eot_id|>"
+                history_text += f"<|im_start|>assistant\n{event.get('text')}<|im_end|>\n"
 
         print(f"DEBUG: HISTORIQUE DE LA CONVERSATION : \n" + history_text)
 
         current_message = slot_value
 
         full_prompt = (
-            f"<|begin_of_text|><|start_header_id|>system<|end_header_id|>\n\n"
-            f"{system_prompt}<|eot_id|>\n"
+            f"<|im_start|>system\n{system_prompt}<|im_end|>\n"
             f"{history_text}"
-            f"<|start_header_id|>user<|end_header_id|>\n\n"
-            f"{current_message}<|eot_id|>\n"
-            f"<|start_header_id|>assistant<|end_header_id|>\n\n"
+            f"<|im_start|>user\n{current_message}<|im_end|>\n"
+            f"<|im_start|>assistant\n"
         )
 
         print("DEBUG: Envoi au LLM...")

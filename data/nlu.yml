@@ -208,14 +208,13 @@ nlu:
 
 - intent: user_choose_theme
   examples: |
-    - je veux une aventure [fantasy](theme)
+    - je veux une aventure [fantaisie](theme)
     - jouons à un jeu d'[horreur](theme)
-    - [dark fantasy](theme)
+    - [cyberpunk](theme)
     - je préfère la [comédie](theme)
     - mettre le thème sur [mystère](theme)
     - style [épique](theme)
     - [investigation](theme)
-    - je veux du steampunk
     - [medieval] (theme)
 
 - intent: user_choose_difficulty
@@ -313,14 +312,13 @@ nlu:
 
 - lookup: theme
   examples: |
-    - fantasy
-    - dark fantasy
+    - fantaisie
     - horreur
     - comédie
     - épique
     - investigation
     - mystère
-    - medevial
+    - medieval
     - cyberpunk
 
 - lookup: difficulty
