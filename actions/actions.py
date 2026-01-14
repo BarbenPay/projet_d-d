@@ -27,13 +27,10 @@ def get_llm():
         print("DEBUG: llama-cpp-python n'est pas installé.")
         return None
 
-    # --- CHANGEMENT ICI ---
-    # On pointe maintenant vers le dossier monté "/app/models"
     model_path = "/app/models/qwen2.5-3b-instruct-q4_k_m.gguf"
 
     if not os.path.exists(model_path):
         print(f"DEBUG: Modèle introuvable à l'emplacement : {model_path}")
-        # Petit debug pour t'aider si ça plante
         print(f"Contenu de /app/models : {os.listdir('/app/models') if os.path.exists('/app/models') else 'Dossier inexistant'}")
         return None
 
@@ -180,7 +177,6 @@ class ActionAskWeapon(Action):
         player_class = tracker.get_slot("class")
         weapons = dictWeaponPossibilityDependingClass.get(player_class, ["sword", "shield"])
         
-        # Affichage texte simple des options
         options_display = ", ".join([w.capitalize() for w in weapons])
 
         dispatcher.utter_message(
@@ -220,7 +216,6 @@ class ActionAskSubrace(Action):
     
 class ActionAskClassWithAbility(Action):
     def name(self) -> Text:
-        # Renommé pour correspondre au slot 'class'
         return "action_ask_class"
     
     def run(self, dispatcher: CollectingDispatcher,
@@ -290,7 +285,6 @@ class ValidateCaracterCreationForm(FormValidationAction):
             dispatcher.utter_message(text=f"Choix impossibles pour {race}. Essayez: {', '.join(valid)}")
             return {"subrace": None}
             
-        # AUTOMATISATION : On récupère la capacité ici
         ability = dictNaturalAbilityFromSubrace.get(slot_value.lower(), "Aucune")
         
         return {"subrace": slot_value, "ability_subrace": ability}
@@ -300,7 +294,6 @@ class ValidateCaracterCreationForm(FormValidationAction):
             dispatcher.utter_message(text="Classe inconnue.")
             return {"class": None}
         
-        # AUTOMATISATION : On récupère la capacité de classe ici
         info = dictClassAbilities.get(slot_value.lower())
         ability = f"{info['name']}: {info['desc']}"
         
@@ -438,7 +431,6 @@ class ValidateAdventureForm(FormValidationAction):
             print(f"ERREUR LLM : {e}")
             dispatcher.utter_message(text="Une perturbation magique brouille les sens du Maître du Donjon... (Erreur technique)")
 
-        # 7. IMPORTANT : Reset du slot pour la boucle infinie
         return {"adventure_text": None}
     
 class ActionGiveHelp(Action):
@@ -455,10 +447,8 @@ class ActionGiveHelp(Action):
         def pretty_list(items: List[str]) -> str:
             return ", ".join([str(s) for s in items])
 
-        # 1) Contexte le plus fiable pendant un form
         expected = tracker.get_slot("requested_slot")
 
-        # 2) Fallback si requested_slot est vide : deviner depuis la derniÃ¨re action
         if not expected:
             last_action = None
             for e in reversed(tracker.events):
@@ -490,7 +480,7 @@ class ActionGiveHelp(Action):
                 text=(
                     "A cette etape, je te demande de choisir la race de ton personnage.\n"
                     f"Choix possibles : {pretty_list(races)}.\n"
-                    "Exemple : elf"
+                    "Exemple : elfe"
                 )
             )
             return []
@@ -502,7 +492,7 @@ class ActionGiveHelp(Action):
                 dispatcher.utter_message(
                     text=(
                         "A cette etape, je te demande une sous-race, mais je n'ai pas encore ta race.\n"
-                        "Choisis d'abord une race (elf, dwarf, human, drow, gnome, dragonborn), puis je te donnerai les sous-races possibles."
+                        "Choisis d'abord une race (elfe, nain, humain, drow, gnome, drakéide), puis je te donnerai les sous-races possibles."
                     )
                 )
                 return []
@@ -536,7 +526,7 @@ class ActionGiveHelp(Action):
                     f"A cette etape, je te demande la sous-race pour : {race}.\n"
                     "Choix possibles :\n"
                     + "\n".join(lines)
-                    + "\nExemple : high"
+                    + "\nExemple : des montagnes"
                 )
             )
             return []
@@ -554,7 +544,7 @@ class ActionGiveHelp(Action):
                     f"Choix possibles : {pretty_list(classes)}.\n\n"
                     "Details :\n"
                     + "\n".join(lines)
-                    + "\n\nExemple : wizard"
+                    + "\n\nExemple : barbare"
                 )
             )
             return []
@@ -590,38 +580,32 @@ class ActionGiveHelp(Action):
             return []
 
         if expected == "attribute":
-            # Liste complÃ¨te basÃ©e sur ton lookup nlu.yml
-            attributes = [
-                "strength", "dexterity", "constitution", "intelligence", "wisdom", "charisma",
-                "power", "agility", "stamina", "magic"
-            ]
+            attributes = ["force", "dextérité", "constitution", "intelligence", "sagesse", "charisme", "puissance", "agilité", "endurance", "magie"]
             dispatcher.utter_message(
                 text=(
                     "A cette etape, je te demande ton attribut principal.\n"
                     f"Choix possibles : {pretty_list(attributes)}.\n"
-                    "Exemple : strength"
+                    "Exemple : puissance"
                 )
             )
             return []
 
         if expected == "theme":
-            # Liste complÃ¨te basÃ©e sur ton lookup nlu.yml
             themes = [
-                "fantasy", "dark fantasy", "horror", "comedy", "epic",
-                "investigation", "mystery", "dungeon crawler", "cyberpunk", "steampunk"
+                "fantaisie", "horreur", "comédie", "épique",
+                "investigation", "mystère", "medieval", "cyberpunk"
             ]
             dispatcher.utter_message(
                 text=(
                     "A cette etape, je te demande le theme de l'aventure.\n"
                     f"Choix possibles : {pretty_list(themes)}.\n"
-                    "Exemple : dark fantasy"
+                    "Exemple : épique"
                 )
             )
             return []
 
         if expected == "difficulty":
-            # Liste complÃ¨te basÃ©e sur ton lookup nlu.yml
-            difficulties = ["easy", "normal", "hard", "expert", "nightmare", "beginner"]
+            difficulties = ["facile", "normal", "difficile", "expert", "cauchemar", "débutant"]
             dispatcher.utter_message(
                 text=(
                     "A cette etape, je te demande la difficulte.\n"
