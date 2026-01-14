@@ -4,8 +4,6 @@ stories:
 - story: Happy path complet (Jeu -> Story -> Perso)
   steps:
   - intent: start_game
-  - action: utter_language_selection
-  - intent: language_selection
   - action: utter_accessibility_selection
   - intent: accessibility_selection
   - action: utter_confirm_settings_game
@@ -30,12 +28,10 @@ stories:
   steps:
   - action: utter_accessibility_selection
   - intent: user_choose_reset
-  - action: utter_language_selection
-  - intent: language_selection
   - action: utter_accessibility_selection
 
 - story: Correction  Refus des settings du jeu (Langue/Accessibilité)
   steps:
   - action: utter_confirm_settings_game
   - intent: deny
-  - action: utter_language_selection
+  - action: utter_accessibility_selection

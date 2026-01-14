@@ -83,14 +83,14 @@ nlu:
     - fais de moi un [barbare](class)
     - je vais jouer un [rôdeur](class)
     - [moine](class) s'il te plait
-    - je préfère [ensorceleur](class)
+    - je préfère [sorcier](class)
     - [druide](class) est mon choix
     - je choisis d'être un [barde](class)
     - ma classe est [paladin](class)
     - créer un [moine](class)
     - allons-y pour un [barbare](class)
     - mettre la classe à [rôdeur](class)
-    - je suis un [ensorceleur](class)
+    - je suis un [sorcier](class)
     - la classe [druide](class)
 
 - intent: user_choose_weapon
@@ -197,15 +197,6 @@ nlu:
     - je veux commencer un nouveau personnage
     - supprimer et recommencer
 
-- intent: language_selection
-  examples: |
-    - je parle [anglais](language)
-    - [français](language) s'il te plait
-    - changer pour [espagnol](language)
-    - [francais](language)
-    - je veux jouer en [anglais](language)
-    - mettre la langue en [allemand](language)
-
 - intent: accessibility_selection
   examples: |
     - activer le mode [audio](accessibility)
@@ -237,17 +228,6 @@ nlu:
     - je suis un [débutant](difficulty)
     - challenge [expert](difficulty)
 
-- intent: user_choose_number_player
-  examples: |
-    - [1](number) joueur
-    - juste [un](number)
-    - nous sommes [2](number)
-    - [3](number) joueurs
-    - [4](number) personnes
-    - mettre les joueurs à [5](number)
-    - partie solo
-    - [seul](number) joueur
-
 - regex: number
   examples: |
     - \d+
@@ -257,7 +237,7 @@ nlu:
     - elfe
     - nain
     - humain
-    - elfes noirs
+    - drow
     - gnome
     - drakéide
 
@@ -307,7 +287,6 @@ nlu:
     - barbare
     - barde
     - rôdeur
-    - ensorceleur
     - sorcier
 
 - lookup: attribute
@@ -322,14 +301,6 @@ nlu:
     - agilité
     - endurance
     - magie
-
-- lookup: language
-  examples: |
-    - anglais
-    - français
-    - francais
-    - espagnol
-    - allemand
 
 - lookup: accessibility
   examples: |
