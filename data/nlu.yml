@@ -1,341 +1,362 @@
 version: "2.0"
+
 nlu:
 - intent: start_game
   examples: |
-    - Hello
-    - Hi
-    - hello
-    - hi
-    - start
-    - start game
-    - new game
-    - let's play
-    - begin
-    - begin adventure
-    - launch
-    - launch the game
-    - I want to play
-    - create a character
-    - create new character
-    - start a new story
-    - let's go
-    - open the game
-    - enter the world
-    - initiate sequence
-    - boot up
-    - start RPG
-    - launch the adventure
-    - begin game
-    - I am ready to start
+    - Bonjour
+    - Salut
+    - allo
+    - commencer
+    - démarrer le jeu
+    - nouvelle partie
+    - allons-y
+    - je veux jouer
+    - créer un personnage
+    - créer un nouveau perso
+    - lancer l'aventure
+    - go
+    - ouvrir le jeu
+    - entrer dans le monde
+    - initialiser la séquence
+    - démarrer le RPG
+    - commencer l'aventure
+    - débuter le jeu
+    - je suis prêt à commencer
+
 - intent: user_choose_race
   examples: |
-    - I want to be an [elf](race)
-    - I choose [dwarf](race)
-    - [human](race)
-    - make me a [drow](race)
+    - Je veux être un [elfe](race)
+    - Je choisis [nain](race)
+    - [humain](race)
+    - fais de moi un [elfe noir](race)
     - [gnome](race)
-    - [dragonborn](race)
-    - I pick [gnome](race)
-    - select [elf](race)
-    - play as a [dragonborn](race)
-    - my race is [human](race)
-    - create a [dwarf](race) character
-    - [drow](race) please
-    - I'll go with [gnome](race)
-    - [elf](race) is my choice
-    - definitely [human](race)
-    - let's be a wizard (race)
+    - [drakéide](race)
+    - je prends [gnome](race)
+    - sélectionner [elfe](race)
+    - jouer un [drakéide](race)
+    - ma race est [humain](race)
+    - créer un personnage [nain](race)
+    - [elfe noir](race) s'il te plait
+    - je vais y aller avec [gnome](race)
+    - [elfe](race) est mon choix
+    - définitivement [ensorceleur](race)
+    - soyons un [magicien](race)
+
 - intent: user_choose_subrace
   examples: |
-    - I choose [high](subrace) elf
-    - I want to be a [wood](subrace) elf
-    - just [high](subrace)
-    - [wood](subrace) ancestry
-    - I am a [high](subrace) elf
-    - pick [wood](subrace)
-    - [hill](subrace) dwarf
-    - I pick [mountain](subrace)
-    - [mountain](subrace) dwarf
-    - I come from the [hill](subrace)s
-    - [hill](subrace)
-    - [rock](subrace) gnome
-    - I am a [forest](subrace) gnome
-    - [deep](subrace) gnome
-    - [rock](subrace)
-    - [forest](subrace)
-    - [cave](subrace)
-    - I want to be a [deep](subrace) drow
-    - I choose [surface](subrace)
-    - [surface](subrace) drow
-    - [deep](subrace) one
-    - [metallic](subrace) ancestry
-    - [gem](subrace) dragonborn
-    - [draconblood](subrace)
-    - I have [metallic](subrace) scales
-    - [gem](subrace) type
-    - [draconblood](subrace) variant
+    - Je choisis haut [elfe](subrace)
+    - elfe [haut](subrace)
+    - Je veux être un elfe [des bois](subrace)
+    - juste [haut](subrace)
+    - ascendance [des bois](subrace)
+    - Je suis un [haut](subrace) elfe
+    - choisir [des bois](subrace)
+    - nain [des collines](subrace)
+    - je prends [des montagnes](subrace)
+    - nain [des montagnes](subrace)
+    - je viens des [collines](subrace)
+    - [collines](subrace)
+    - gnome [des roches](subrace)
+    - je suis un gnome [des forêts](subrace)
+    - gnome [des profondeurs](subrace)
+    - [des roches](subrace)
+    - [des forêts](subrace)
+    - [des cavernes](subrace)
+    - je veux être un drow [des profondeurs](subrace)
+    - je choisis [de la surface](subrace)
+    - drow [de la surface](subrace)
+    - ceux [des profondeurs](subrace)
+    - ascendance [métallique](subrace)
+    - drakéide [gemme](subrace)
+    - [sang-dragon](subrace)
+    - j'ai des écailles [métalliques](subrace)
+    - type [gemme](subrace)
+    - variante [sang-dragon](subrace)
+
 - intent: user_choose_class
   examples: |
-    - [wizard](class)
-    - [rogue](class)
+    - [magicien](class)
+    - [roublard](class)
     - [paladin](class)
-    - I want to be a [wizard](class)
-    - I select the [rogue](class) class
-    - make me a [barbarian](class)
-    - I will play a [ranger](class)
-    - [monk](class) please
-    - I prefer [sorcerer](class)
-    - [druid](class) is my choice
-    - I choose to be a [bard](class)
-    - my class is [paladin](class)
-    - create a [monk](class)
-    - let's go with [barbarian](class)
-    - set class to [ranger](class)
-    - I am a [sorcerer](class)
-    - the [druid](class) class
+    - je veux être un [magicien](class)
+    - je sélectionne la classe [roublard](class)
+    - fais de moi un [barbare](class)
+    - je vais jouer un [rôdeur](class)
+    - [moine](class) s'il te plait
+    - je préfère [ensorceleur](class)
+    - [druide](class) est mon choix
+    - je choisis d'être un [barde](class)
+    - ma classe est [paladin](class)
+    - créer un [moine](class)
+    - allons-y pour un [barbare](class)
+    - mettre la classe à [rôdeur](class)
+    - je suis un [ensorceleur](class)
+    - la classe [druide](class)
+
 - intent: user_choose_weapon
   examples: |
-    - [sword](weapon)
-    - [bow](weapon)
-    - [staff](weapon)
-    - I equip my [sword](weapon)
-    - [longsword](weapon)
-    - I take the [bow](weapon)
-    - [axe](weapon)
-    - [mace](weapon)
-    - I use a [staff](weapon)
-    - [dagger](weapon)
-    - [hammer](weapon)
-    - [shield](weapon)
-    - I wield a [longsword](weapon)
-    - give me the [orb](weapon)
-    - I fight with a [mace](weapon)
-    - I choose the [luth](weapon)
-    - my weapon is a [dagger](weapon)
-    - I want the [axe](weapon)
-    - equip [shield](weapon)
-    - use [hammer](weapon)
+    - [épée](weapon)
+    - [arc](weapon)
+    - [bâton](weapon)
+    - j'équipe mon [épée](weapon)
+    - [épée longue](weapon)
+    - je prends l'[arc](weapon)
+    - [hache](weapon)
+    - [masse](weapon)
+    - j'utilise un [bâton](weapon)
+    - [dague](weapon)
+    - [marteau](weapon)
+    - [bouclier](weapon)
+    - je manie une [épée longue](weapon)
+    - donne-moi l'[orbe](weapon)
+    - je me bats avec une [masse](weapon)
+    - je choisis le [luth](weapon)
+    - mon arme est une [dague](weapon)
+    - je veux la [hache](weapon)
+    - équiper [bouclier](weapon)
+    - utiliser [marteau](weapon)
+
 - intent: user_choose_attribute
   examples: |
-    - I want to be [strong](attribute)
-    - prioritize [intelligence](attribute)
-    - my best stat is [charisma](attribute)
-    - put points in [dexterity](attribute)
-    - focus on [wisdom](attribute)
-    - [constitution](attribute) is important
-    - I choose [agility](attribute)
-    - increase my [magic](attribute)
-    - I have [15](number) in [wisdom](attribute)
-    - set [strength](attribute) to [18](number)
-    - [dexterity](attribute) [14](number)
-    - put [10](number) in [constitution](attribute)
-    - my [intelligence](attribute) is [16](number)
-    - [charisma](attribute) equals [8](number)
-    - assign [12](number) to [power](attribute)
-    - [agility](attribute) should be [13](number)
-    - set [stamina](attribute) to [15](number)
+    - je veux être [fort](attribute)
+    - prioriser l'[intelligence](attribute)
+    - ma meilleure stat est le [charisme](attribute)
+    - mettre des points en [dextérité](attribute)
+    - focus sur la [sagesse](attribute)
+    - la [constitution](attribute) est importante
+    - je choisis l'[agilité](attribute)
+    - augmenter ma [magie](attribute)
+    - j'ai [15](number) en [sagesse](attribute)
+    - mettre la [force](attribute) à [18](number)
+    - [dextérité](attribute) [14](number)
+    - mettre [10](number) en [constitution](attribute)
+    - mon [intelligence](attribute) est de [16](number)
+    - [charisme](attribute) égal à [8](number)
+    - assigner [12](number) à la [puissance](attribute)
+    - l'[agilité](attribute) devrait être à [13](number)
+    - mettre l'[endurance](attribute) à [15](number)
+
 - intent: affirm
   examples: |
-    - yes
-    - y
-    - indeed
-    - of course
-    - that sounds good
+    - oui
+    - ouais
+    - effectivement
+    - bien sûr
+    - ça me va
     - correct
-    - sure
-    - confirm settings
-    - I accept this difficulty
-    - that fits me
-    - the parameters are good
-    - validate choices
-    - yes let's play with this
-    - sounds perfect for the theme
-    - confirm language
+    - confirmer les réglages
+    - j'accepte cette difficulté
+    - ça me correspond
+    - les paramètres sont bons
+    - valider les choix
+    - oui jouons avec ça
+    - ça semble parfait pour le thème
+    - confirmer la langue
+
 - intent: deny
   examples: |
-    - no
-    - n
-    - never
-    - I don't think so
-    - don't like that
-    - no way
-    - not really
+    - non
+    - jamais
+    - je ne pense pas
+    - j'aime pas ça
+    - pas question
+    - pas vraiment
     - stop
-    - wrong settings
-    - I refuse this theme
-    - incorrect parameters
-    - no change the difficulty
-    - I want to change options
-    - these are not the right settings
-    - reject
+    - mauvais réglages
+    - je refuse ce thème
+    - paramètres incorrects
+    - non change la difficulté
+    - je veux changer les options
+    - ce ne sont pas les bons réglages
+    - rejeter
+
 - intent: user_ask_help
   examples: |
-    - help
-    - I don't understand
-    - what can I do?
-    - can you help me?
-    - what are the options?
-    - I am lost
-    - give me a hint
-    - what does this mean?
+    - aide
+    - au secours
+    - je ne comprends pas
+    - que puis-je faire ?
+    - peux-tu m'aider ?
+    - quelles sont les options ?
+    - je suis perdu
+    - donne-moi un indice
+    - qu'est-ce que ça veut dire ?
+
 - intent: user_choose_reset
   examples: |
-    - go back
-    - wait I made a mistake
-    - previous step
-    - can I change my choice?
-    - undo
-    - I want to change something
-    - restart
-    - start over
+    - retour
+    - attends j'ai fait une erreur
+    - étape précédente
+    - puis-je changer mon choix ?
+    - annuler
+    - je veux changer quelque chose
+    - redémarrer
+    - recommencer
     - reset
-    - begin again
-    - I want to start a new character
-    - delete and restart
+    - tout recommencer
+    - je veux commencer un nouveau personnage
+    - supprimer et recommencer
+
 - intent: language_selection
   examples: |
-    - I speak [english](language)
-    - [french](language) please
-    - switch to [spanish](language)
+    - je parle [anglais](language)
+    - [français](language) s'il te plait
+    - changer pour [espagnol](language)
     - [francais](language)
-    - I want to play in [english](language)
-    - set language to [german](language)
+    - je veux jouer en [anglais](language)
+    - mettre la langue en [allemand](language)
+
 - intent: accessibility_selection
   examples: |
-    - enable [audio](accessibility) mode
-    - I prefer [text only](accessibility)
-    - activate [screen reader](accessibility) support
-    - I am [blind](accessibility)
-    - [voice only](accessibility)
-    - set accessibility to [high contrast](accessibility)
-    - [simplified](accessibility) mode please
+    - activer le mode [audio](accessibility)
+    - je préfère par [texte](accessibility)
+    - activer la [voix](accessibility)
+    - [voix seulement](accessibility)
+    - par la [parole](accessibility) s'il te plait
+    - je prefere [ecrire](accessibility)
+
 - intent: user_choose_theme
   examples: |
-    - I want a [fantasy](theme) adventure
-    - let's play a [horror](theme) game
+    - je veux une aventure [fantasy](theme)
+    - jouons à un jeu d'[horreur](theme)
     - [dark fantasy](theme)
-    - I prefer [comedy](theme)
-    - set theme to [mystery](theme)
-    - [epic](theme) style
+    - je préfère la [comédie](theme)
+    - mettre le thème sur [mystère](theme)
+    - style [épique](theme)
     - [investigation](theme)
-    - I want steampunk
+    - je veux du steampunk
+    - [medieval] (theme)
+
 - intent: user_choose_difficulty
   examples: |
-    - [easy](difficulty) mode
-    - I want to play in [hard](difficulty)
-    - [story](difficulty) mode please
-    - set difficulty to [nightmare](difficulty)
+    - mode [facile](difficulty)
+    - je veux jouer en [difficile](difficulty)
+    - mode [normal](difficulty) s'il te plait
+    - mettre la difficulté sur [cauchemar](difficulty)
     - [normal](difficulty)
-    - I am a [beginner](difficulty)
-    - [expert](difficulty) challenge
+    - je suis un [débutant](difficulty)
+    - challenge [expert](difficulty)
+
 - intent: user_choose_number_player
   examples: |
-    - [1](number) player
-    - just [one](number)
-    - we are [2](number)
-    - [3](number) players
-    - [4](number) people
-    - set players to [5](number)
-    - solo game
-    - [single](number) player
-- intent: admin_story
-  examples: |
-    - admin story
-- intent: admin_character
-  examples: |
-    - admin character
+    - [1](number) joueur
+    - juste [un](number)
+    - nous sommes [2](number)
+    - [3](number) joueurs
+    - [4](number) personnes
+    - mettre les joueurs à [5](number)
+    - partie solo
+    - [seul](number) joueur
+
 - regex: number
   examples: |
     - \d+
+
 - lookup: race
   examples: |
-    - elf
-    - dwarf
-    - human
-    - drow
+    - elfe
+    - nain
+    - humain
+    - elfes noirs
     - gnome
-    - dragonborn
+    - drakéide
+
 - lookup: subrace
   examples: |
-    - high
-    - wood
-    - hill
-    - mountain
-    - rock
-    - forest
-    - cave
-    - deep
+    - haut
+    - bois
+    - des bois
+    - collines
+    - des collines
+    - montagnes
+    - des montagnes
+    - roches
+    - des roches
+    - forêts
+    - des forêts
+    - cavernes
+    - profondeurs
+    - des profondeurs
     - surface
-    - metallic
-    - gem
-    - draconblood
+    - de la surface
+    - métallique
+    - gemme
+    - sang-dragon
+
 - lookup: weapon
   examples: |
-    - sword
-    - longsword
-    - bow
-    - axe
-    - mace
-    - staff
-    - dagger
-    - hammer
-    - shield
-    - orb
+    - épée
+    - épée longue
+    - arc
+    - hache
+    - masse
+    - bâton
+    - dague
+    - marteau
+    - bouclier
+    - orbe
     - luth
+
 - lookup: class
   examples: |
     - paladin
-    - rogue
-    - wizard
-    - druid
-    - monk
-    - barbarian
-    - bard
-    - ranger
-    - sorcerer
+    - roublard
+    - magicien
+    - druide
+    - moine
+    - barbare
+    - barde
+    - rôdeur
+    - ensorceleur
+    - sorcier
+
 - lookup: attribute
   examples: |
-    - strength
-    - dexterity
+    - force
+    - dextérité
     - constitution
     - intelligence
-    - wisdom
-    - charisma
-    - power
-    - agility
-    - stamina
-    - magic
+    - sagesse
+    - charisme
+    - puissance
+    - agilité
+    - endurance
+    - magie
+
 - lookup: language
   examples: |
-    - english
-    - french
+    - anglais
+    - français
     - francais
-    - spanish
-    - german
+    - espagnol
+    - allemand
+
 - lookup: accessibility
   examples: |
     - audio
-    - text
-    - voice only
-    - text only
-    - blind
-    - deaf
+    - texte
+    - voix seulement
+    - texte seulement
+    - parole
+    - ecrire
+
 - lookup: theme
   examples: |
     - fantasy
     - dark fantasy
-    - horror
-    - comedy
-    - epic
+    - horreur
+    - comédie
+    - épique
     - investigation
-    - mystery
-    - dungeon crawler
+    - mystère
+    - medevial
     - cyberpunk
+
 - lookup: difficulty
   examples: |
-    - easy
+    - facile
     - normal
-    - hard
+    - difficile
     - expert
-    - nightmare
-    - beginner
+    - cauchemar
+    - débutant
