@@ -1,8 +1,8 @@
 import requests
 import speech_recognition as sr
+import pyttsx3
 from ctypes import *
 
-# Suppression des erreurs ALSA
 try:
     ERROR_HANDLER_FUNC = CFUNCTYPE(None, c_char_p, c_int, c_char_p, c_int, c_char_p)
     def py_error_handler(filename, line, function, err, fmt): pass
@@ -11,9 +11,21 @@ try:
     asound.snd_lib_error_set_handler(c_error_handler)
 except: pass
 
+# Initialisation du moteur de synthese vocale (TTS)
+tts_engine = pyttsx3.init()
+tts_engine.setProperty('rate', 150) # Vitesse de parole
+
 RASA_URL = "http://localhost:5005/webhooks/rest/webhook"
 SENDER_ID = "client_user"
 current_mode = "text"
+
+def speak_text(text):
+    """Lit le texte a haute voix"""
+    try:
+        tts_engine.say(text)
+        tts_engine.runAndWait()
+    except Exception as e:
+        print(f"Erreur TTS: {e}")
 
 def listen_audio():
     r = sr.Recognizer()
@@ -22,7 +34,6 @@ def listen_audio():
         try:
             r.adjust_for_ambient_noise(source, duration=0.5)
             audio = r.listen(source, timeout=5)
-            # Change "fr-FR" en "en-US" si tu parles anglais
             return r.recognize_google(audio, language="en-US")
         except:
             return None
@@ -44,10 +55,14 @@ while True:
         resp = requests.post(RASA_URL, json=payload).json()
 
         for msg in resp:
-            if "text" in msg:
-                print(f"Bot: {msg['text']}")
+            bot_text = msg.get("text")
+
+            if bot_text:
+                print(f"Bot: {bot_text}")
+                
+                if current_mode == "audio":
+                    speak_text(bot_text)
             
-            # Detection du changement de mode envoye par actions.py
             if "custom" in msg and "set_mode" in msg["custom"]:
                 current_mode = msg["custom"]["set_mode"]
                 print(f"--- Mode change : {current_mode} ---")
