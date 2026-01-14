@@ -4,17 +4,22 @@ config:
 session_config:
   session_expiration_time: 60
   carry_over_slots_to_new_session: true
-
 intents:
 - affirm:
     use_entities: true
 - deny:
     use_entities: true
+- greet:
+    use_entities: true
+- goodbye:
+    use_entities: true
+- bot_challenge:
+    use_entities: true
+- start_game:
+    use_entities: true
 - user_ask_help:
     use_entities: true
 - user_choose_reset:
-    use_entities: true
-- start_game:
     use_entities: true
 - language_selection:
     use_entities: true
@@ -101,67 +106,124 @@ slots:
     initial_value: null
     auto_fill: true
     influence_conversation: true
-  race_ability:
-    type: any
+  requested_slot:
+    type: rasa.shared.core.slots.AnySlot
+    initial_value: null
+    auto_fill: true
     influence_conversation: false
-  class_ability:
-    type: any
-    influence_conversation: false
-
 responses:
   utter_greet:
-  - text: Hello adventurer! Ready to create your character?
-  utter_language_selection:
-  - text: Which language would you like to use?
-  - text: Hello adventurer! Ready to create your character?
-  utter_accessibility_selection:
-  - text: 'How would you like to play the game: text-based or voice-based?'
-  utter_confirm_settings_game:
-  - text: |
-      Here is your game configuration:
-      - Language : {language}
-      - Accessibility : {accessibility}
-
-      Does everything look good?
-  utter_start_story_settings:
-  - text: Great! Let's start choosing your story settings.
+  - text: Bonjour aventurier ! Prêt à configurer ta partie ? Dis 'start game' pour commencer.
+  utter_ask_language:
+  - text: Quelle langue souhaites-tu utiliser ? (English, French...)
+  utter_ask_accessibility:
+  - text: Quel mode d'accessibilité ? (Audio, Text only...)
+  utter_submit_accessibility:
+  - text: C'est noté pour l'accessibilité ({language} / {accessibility}). Veux-tu passer aux réglages du jeu ?
   utter_ask_theme:
-  - text: What theme do you want for the adventure (dark fantasy, fantasy, steampunk...)?
+  - text: Quel thème d'aventure ? (Fantasy, Horror...)
   utter_ask_difficulty:
-  - text: Choose a difficulty (easy, normal, hard).
-  utter_ask_number_player:
-  - text: How many players will join the game?
-  utter_confirm_story:
-  - text: |
-      Here is your storie configuration:
-      - Theme : {theme}
-      - Difficulty : {difficulty}
-      - Number of players : {nb_players}
-
-      Does everything look good?
-  utter_start_creation_character:
-  - text: Great! Let's start creating your character.
+  - text: Quelle difficulté ? (Easy, Normal, Hard)
+  utter_ask_nb_players:
+  - text: Combien de joueurs ?
+  utter_submit_game_settings:
+  - text: Paramètres de jeu validés ({theme}, {difficulty}, {nb_players} joueurs). Prêt pour la création de ton personnage ?
   utter_ask_race:
-  - text: Choose a race (elf, dwarf, human, drow, gnome, dragonborn).
+  - text: Quelle est la race de ton personnage ? (Elf, Dwarf...)
+  utter_ask_subrace:
+  - text: Quelle sous-race ?
+  utter_ask_class:
+  - text: Quelle classe ? (Wizard, Rogue...)
+  utter_ask_weapon:
+  - text: Quelle arme ?
   utter_ask_attribute:
-  - text: What represents your character best? (Strength, Intelligence, Charisma...)
+  - text: Quel est ton attribut principal ? (Strength, Intelligence...)
   utter_confirm_character:
   - text: |
-      Here is your character:
+      Personnage créé :
       - Race: {race}
       - Subrace: {subrace}
-      - Class: {class}
-      - Weapon: {weapon}
-      - Attribute {attribute}
-      - Ability {ability}
+      - Classe: {class}
+      - Arme: {weapon}
+      - Attribut: {attribute}
 
-      Does everything look good?
+      Tout est bon ?
   utter_done:
-  - text: Perfect! Your character has been created.
+  - text: Parfait !
+  utter_setup_complete:
+  - text: Configuration terminée, lancement du jeu...
 actions:
 - action_ask_subrace
 - action_ask_weapon
 - action_check_weapon
 - action_ask_class_with_ability
-forms: {}
+- action_fill_all_the_slot
+- accessibility_form
+- game_settings_form
+- character_creation_form
+- action_sync_accessibility
+forms:
+  form_accessibilite:
+    required_slots:
+      accessibility:
+      - entity: accessibility
+        intent:
+        - start_game
+        - accessibility_selection
+        - language_selection
+        type: from_entity
+      language:
+      - entity: language
+        intent:
+        - start_game
+        - language_selection
+        type: from_entity
+  form_game_settings:
+    required_slots:
+      difficulty:
+      - entity: difficulty
+        intent:
+        - start_game
+        - user_choose_difficulty
+        type: from_entity
+      nb_players:
+      - entity: number
+        intent:
+        - start_game
+        - user_choose_number_player
+        type: from_entity
+      theme:
+      - entity: theme
+        intent:
+        - start_game
+        - user_choose_theme
+        type: from_entity
+  form_creation_partenaire:
+    required_slots:
+      attribute:
+      - entity: attribute
+        intent:
+        - user_choose_attribute
+        type: from_entity
+      class:
+      - entity: class
+        intent:
+        - user_choose_class
+        type: from_entity
+      race:
+      - entity: race
+        intent:
+        - user_choose_race
+        type: from_entity
+      subrace:
+      - entity: subrace
+        intent:
+        - user_choose_subrace
+        - user_choose_race
+        type: from_entity
+      weapon:
+      - entity: weapon
+        intent:
+        - user_choose_weapon
+        type: from_entity
 e2e_actions: []

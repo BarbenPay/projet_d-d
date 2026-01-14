@@ -1,76 +1,24 @@
 version: "2.0"
+
 stories:
-- story: character creation
+
+- story: Test Switch Text to Vocal
   steps:
-  - action: utter_ask_race
-  - intent: user_choose_race
-  - action: action_ask_subrace
-  - intent: user_choose_subrace
-  - action: utter_ask_class
-  - intent: user_choose_class
-  - action: action_ask_weapon
-  - intent: user_choose_weapon
-  - action: utter_confirm_character
+  # 1. Tu dis bonjour
+  - intent: start_game
   
-
-- story: Story from Conversation ID 238e7ae4e6b146a39dfa1d823deba0cc
-  steps:
-  - intent: greet
-  - action: utter_ask_race
-  - intent: user_choose_race
-  - slot_was_set:
-    - race: dwarf
-  - action: action_ask_subrace
-  - intent: deny
-  - action: utter_ask_race
-  - intent: user_choose_race
-  - slot_was_set:
-    - race: elf
-  - action: action_ask_subrace
-  - intent: user_choose_subrace
-  - intent: subrace
+  # 2. AU LIEU DU FORMULAIRE, le bot pose la question directement
+  - action: utter_ask_accessibility
+  
+  # 3. Tu réponds "audio" (Simulé ou réel)
+  - intent: accessibility_selection
     entities:
-    - subrace: high
+    - accessibility: "audio"
   - slot_was_set:
-    - subrace: high
-  - action: utter_ask_class
-  - intent: user_choose_class
-  - action: action_ask_weapon
-  - intent: user_choose_weapon
-  - action: utter_confirm_character
-
-
-- story: Story from Conversation ID b7ef9fdcfcce4671b01b812f700913f4
-  steps:
-  - intent: greet
-  - action: utter_ask_race
-  - intent: user_choose_race
-  - action: action_ask_subrace
-  - intent: user_choose_race
-    entities:
-    - race: drow
-  - slot_was_set:
-    - race: drow
-  - action: action_ask_subrace
-  - intent: deny
-  - action: utter_ask_race
-  - intent: user_choose_race
-  - action: action_ask_subrace
-  - intent: subrace
-    entities:
-    - subrace: surface
-  - slot_was_set:
-    - subrace: surface
-  - action: utter_ask_class
-  - intent: user_choose_class
-    entities:
-    - class: wizard
-  - slot_was_set:
-    - class: wizard
-  - action: action_ask_weapon
-  - intent: weapon
-    entities:
-    - weapon: orb
-  - slot_was_set:
-    - weapon: orb
-  - action: utter_confirm_character
+    - accessibility: "audio"
+    
+  # 4. C'est ici que la magie opère : envoi du signal au client
+  - action: action_sync_accessibility
+  
+  # 5. Confirmation
+  - action: utter_submit_accessibility

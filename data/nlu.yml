@@ -132,6 +132,11 @@ nlu:
     - initiate sequence
     - boot up
     - start RPG
+    - start game in [english](language)
+    - I want to play in [french](language) with [text only](accessibility)
+    - launch adventure [audio](accessibility) mode
+    - begin in [english](language)
+    - let's play [text only](accessibility)
 
 - intent: user_choose_race
   examples: |
@@ -348,6 +353,8 @@ nlu:
     - [francais](language)
     - I want to play in [english](language)
     - set language to [german](language)
+    - [english](language) and [text only](accessibility)
+    - I pick [french](language) and [audio](accessibility)
 
 - intent: accessibility_selection
   examples: |
