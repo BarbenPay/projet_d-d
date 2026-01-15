@@ -38,6 +38,5 @@ story_graph.dot
 
 # --- SÉCURITÉ (Très important) ---
 .env
-credentials.yml
 # (Note : ne décommente credentials.yml que si tu as des mots de passe réels dedans. 
 # Si c'est le fichier par défaut vide, tu peux le laisser sur git)

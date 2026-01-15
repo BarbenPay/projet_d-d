@@ -205,6 +205,8 @@ nlu:
     - [voix seulement](accessibility)
     - par la [parole](accessibility) s'il te plait
     - je prefere [ecrire](accessibility)
+    - je voudrais [parler](accessibility)
+    - a l'[oral](accessibility)
 
 - intent: user_choose_theme
   examples: |
@@ -309,6 +311,8 @@ nlu:
     - texte seulement
     - parole
     - ecrire
+    - parler
+    - oral
 
 - lookup: theme
   examples: |

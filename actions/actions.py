@@ -3,7 +3,7 @@
 
 import os
 import time
-import psutil
+#import psutil
 from typing import Any, Text, Dict, List
 from rasa_sdk import Action, Tracker
 from rasa_sdk.events import SlotSet, ActiveLoop
@@ -19,7 +19,7 @@ def get_llm():
 
     print("⏳ Initialisation du chargement du LLM...")
 
-    mem_before = print_memory_usage("Avant chargement du modèle")
+    #mem_before = print_memory_usage("Avant chargement du modèle")
     
     try:
         from llama_cpp import Llama
@@ -45,7 +45,7 @@ def get_llm():
             verbose=False
         )
 
-        mem_after = print_memory_usage("Après chargement du modèle")
+        #mem_after = print_memory_usage("Après chargement du modèle")
 
         diff = mem_after - mem_before
 
@@ -58,11 +58,11 @@ def get_llm():
         return None
     
 
-def print_memory_usage(step_name=""):
-    process = psutil.Process(os.getpid())
-    ram_mb = process.memory_info().rss / 1024 / 1024 
-    print(f"DEBUG: Mémoire consommée par le LLM {step_name} : {ram_mb:.2f} MB utilisés")
-    return ram_mb
+# def print_memory_usage(step_name=""):
+#     process = psutil.Process(os.getpid())
+#     ram_mb = process.memory_info().rss / 1024 / 1024 
+#     print(f"DEBUG: Mémoire consommée par le LLM {step_name} : {ram_mb:.2f} MB utilisés")
+#     return ram_mb
 
 dictWeaponPossibilityDependingClass = {
             "paladin": ["épée longue", "marteau", "bouclier", "masse", "épée"],
@@ -656,4 +656,25 @@ class ActionGiveHelp(Action):
                 "Dis-moi si tu es en train de choisir : theme, difficulte, nombre de joueurs, race, sous-race, classe, arme, attribut."
             )
         )
+        return []
+
+class ActionUpdateInterfaceMode(Action):
+
+    def name(self) -> str:
+        return "action_update_interface_mode"
+
+    def run(self, dispatcher: CollectingDispatcher,
+            tracker: Tracker,
+            domain: dict) -> list:
+
+        mode_choisi = tracker.get_slot("accessibility")
+        
+        mode_technique = "text"
+
+        # AJOUTE "parler" ET "parole" DANS LA LISTE CI-DESSOUS
+        if mode_choisi and mode_choisi.lower() in ["audio", "voix", "voice", "oral", "parler", "parole"]:
+            mode_technique = "audio"
+
+        dispatcher.utter_message(json_message={"set_mode": mode_technique})
+
         return []
