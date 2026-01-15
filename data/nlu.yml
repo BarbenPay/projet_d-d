@@ -329,3 +329,13 @@ nlu:
     - expert
     - cauchemar
     - débutant
+- intent: undo
+  examples: |
+    - undo
+    - retour
+    - non attends
+    - je me suis trompé
+    - reviens en arrière
+    - annule ma dernière réponse
+    - précédent
+    - back

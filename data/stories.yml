@@ -4,8 +4,8 @@ stories:
 - story: Happy path complet (Jeu -> Story -> Perso)
   steps:
   - intent: start_game
-  - action: utter_accessibility_selection
-  - intent: accessibility_selection
+  - active_loop: game_settings_form
+  - active_loop: null
   - action: utter_confirm_settings_game
   - intent: affirm
   
@@ -20,9 +20,65 @@ stories:
   - active_loop: null
   - action: utter_confirm_character
   - intent: affirm
+
+  - action: utter_ask_if_the_user_is_ready_to_start
+  - intent: affirm
+
+  - action: action_start_adventure
   
   - action: adventure_form
   - active_loop: adventure_form
+
+- story: reset after accessibility
+  steps:
+  - intent: start_game
+  - action: utter_accessibility_selection
+  - intent: accessibility_selection
+  - action: utter_confirm_settings_game
+  - intent: undo
+  - action: action_undo
+
+  - action: utter_accessibility_selection
+  - intent: accessibility_selection
+  - action: utter_confirm_settings_game
+  - intent: affirm
+
+
+- story: reset after game_settings
+  steps:
+  
+  - action: game_settings_form
+  - active_loop: game_settings_form
+  - active_loop: null
+  - action: utter_confirm_story
+  - intent: undo
+  - action: action_undo
+
+
+  - action: game_settings_form
+  - active_loop: game_settings_form
+  - active_loop: null
+  - action: utter_confirm_story
+  - intent: affirm
+
+
+- story: reset after player_creation
+  steps:
+    
+  - action: caracter_creation_form 
+  - active_loop: caracter_creation_form
+  - active_loop: null
+  - action: utter_confirm_character
+  - intent: undo
+  - action: action_undo
+
+  - action: caracter_creation_form 
+  - active_loop: caracter_creation_form
+  - active_loop: null
+  - action: utter_confirm_character
+  - intent: affirm
+  - action: utter_ask_if_the_user_is_ready_to_start
+
 
 - story: Correction  Retour à la langue depuis accessibilité
   steps:

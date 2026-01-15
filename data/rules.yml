@@ -5,37 +5,52 @@ rules:
 # --- Règle pour interrompre les settings du jeu ---
 - rule: Interruption game settings
   condition:
-  - active_loop: game_settings_form  # On nomme explicitement le form (String)
-  steps:
-  - intent: user_choose_reset      # "Stop", "Annuler"
-  - action: action_deactivate_loop # On tue la loop
-  - active_loop: null              # On confirme qu'elle est morte
-  - action: utter_confirm_settings_game # Optionnel : retour au menu précédent
-
-# --- Règle pour interrompre la création de perso ---
-- rule: Interruption character creation
-  condition:
-  - active_loop: caracter_creation_form # On nomme explicitement le form (String)
+  - active_loop: game_settings_form
   steps:
   - intent: user_choose_reset
   - action: action_deactivate_loop
   - active_loop: null
-  - action: utter_confirm_story # Optionnel : retour au menu 
+  - action: utter_confirm_settings_game
+
+# --- Règle pour interrompre la création de perso ---
+- rule: Interruption character creation
+  condition:
+  - active_loop: caracter_creation_form
+  steps:
+  - intent: user_choose_reset
+  - action: action_deactivate_loop
+  - active_loop: null
+  - action: utter_confirm_story
   
-- rule: Start Adventure Loop
+# --- CHAÎNE DE DÉMARRAGE DU JEU (Corrigée & Fusionnée) ---
+
+# 1. Fin du form -> Demande si prêt
+- rule: Ask Confirmation Start Game
   steps:
   - action: caracter_creation_form
   - active_loop: null
+  - slot_was_set:
+    - requested_slot: null
   - action: utter_confirm_character
   - intent: affirm
-  - action: adventure_form      # On lance le formulaire d'aventure
-  - active_loop: adventure_form # On confirme qu'il est actif
+  - action: utter_ask_if_the_user_is_ready_to_start
+
+# 2. Prêt -> Lancement intro -> Lancement Formulaire (Tout en un bloc)
+- rule: Start Adventure Sequence
+  steps:
+  - action: utter_ask_if_the_user_is_ready_to_start
+  - intent: affirm
+  - action: action_start_adventure
+  - action: adventure_form
+  - active_loop: adventure_form
+
+# --- GESTION DE LA BOUCLE AVENTURE ---
 
 - rule: Stop Adventure Loop (Reset)
   condition:
   - active_loop: adventure_form
   steps:
-  - intent: user_choose_reset   # Seul cet intent peut casser la boucle grâce au 'not_intent' du domain
+  - intent: user_choose_reset
   - action: action_deactivate_loop
   - active_loop: null
 
@@ -43,3 +58,40 @@ rules:
   steps:
   - intent: user_ask_help
   - action: action_give_help
+
+# --- GESTION DES UNDO ---
+
+- rule: Undo inside Game Settings
+  condition:
+  - active_loop: game_settings_form
+  steps:
+  - intent: undo
+  - action: action_undo
+
+- rule: Undo inside Character Creation
+  condition:
+  - active_loop: caracter_creation_form
+  steps:
+  - intent: undo
+  - action: action_undo
+
+- rule: Undo inside Adventure
+  condition:
+  - active_loop: adventure_form
+  steps:
+  - intent: undo
+  - action: action_undo
+
+# --- SUBMIT FORMS ---
+# Note: J'ai intégré la logique du submit character dans la règle "Ask Confirmation Start Game" plus haut
+# Mais on garde celle des settings ici
+
+- rule: Submit Game Settings Form
+  condition:
+  - active_loop: game_settings_form
+  steps:
+  - action: game_settings_form
+  - active_loop: null
+  - slot_was_set:
+    - requested_slot: null
+  - action: utter_confirm_story

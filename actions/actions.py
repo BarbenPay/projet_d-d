@@ -4,9 +4,10 @@
 import os
 import time
 import psutil
+import re
 from typing import Any, Text, Dict, List
 from rasa_sdk import Action, Tracker
-from rasa_sdk.events import SlotSet, ActiveLoop
+from rasa_sdk.events import SlotSet, ActiveLoop, UserUtteranceReverted, FollowupAction 
 from rasa_sdk.executor import CollectingDispatcher
 from rasa_sdk.forms import FormValidationAction
 
@@ -29,17 +30,18 @@ def get_llm():
 
     # --- CHANGEMENT ICI ---
     # On pointe maintenant vers le dossier monté "/app/models"
-    model_path = "/app/models/mistral-7b-instruct-v0.2.Q3_K_M.gguf"
+    model_path = "/app/models/qwen2.5-3b-instruct-q4_k_m.gguf"
 
     if not os.path.exists(model_path):
         print(f"DEBUG: Modèle introuvable à l'emplacement : {model_path}")
+        # Petit debug pour t'aider si ça plante
         print(f"Contenu de /app/models : {os.listdir('/app/models') if os.path.exists('/app/models') else 'Dossier inexistant'}")
         return None
 
     try:
         _llm_instance = Llama(
             model_path=model_path,
-            n_ctx=8192,
+            n_ctx=2048,
             n_threads=6,
             verbose=False
         )
@@ -315,6 +317,77 @@ class ValidateCaracterCreationForm(FormValidationAction):
             return {"attribute": None}
         return {"attribute": slot_value}
         
+class ActionStartAdventure(Action):
+    def name(self) -> Text:
+        return "action_start_adventure"
+
+    def run(self, dispatcher: CollectingDispatcher,
+            tracker: Tracker,
+            domain: Dict[Text, Any]) -> List[Dict[Text, Any]]:
+
+        llm = get_llm()
+        if llm is None:
+            dispatcher.utter_message(text="[Erreur] Le Narrateur dort (Modèle non chargé).")
+            return []
+
+        theme = tracker.get_slot("theme") or "Médiéval Fantastique"
+        difficulty = tracker.get_slot("difficulty") or "Normale"
+        p_race = tracker.get_slot("race") or "Inconnu"
+        p_class = tracker.get_slot("class") or "Aventurier"
+        p_weapon = tracker.get_slot("weapon") or "Mains nues"
+        p_attribute = tracker.get_slot("attribute") or "Aucun"
+        
+        system_prompt = (
+            "Tu es le Maître du Donjon. Tu dois narrer une aventure captivante.\n"
+            "RÈGLES :\n"
+            "1. Commence TOUJOURS ta réponse par un bloc JSON strict pour valider l'action.\n"
+            "2. Après le JSON, écris une narration riche et immersive en français (Introduction de l'histoire).\n"
+            "FORMAT JSON OBLIGATOIRE :\n"
+            "```json\n"
+            "{\n"
+            '  "action_valide": true,\n'
+            '  "raison": "Introduction",\n'
+            '  "changements_etat": "Début de l\'aventure"\n'
+            "}\n"
+            "```\n"
+            f"JOUEUR: {p_race} {p_class} ({theme}, Difficulté {difficulty}). Arme: {p_weapon}."
+        )
+
+        full_prompt = (
+            f"<|im_start|>system\n{system_prompt}<|im_end|>\n"
+            f"<|im_start|>user\n(Système) Génère l'introduction de l'aventure maintenant. Décris le lieu de départ et l'ambiance selon le thème {theme}.<|im_end|>\n"
+            f"<|im_start|>assistant\n```json"
+        )
+
+        print("DEBUG: Génération de l'introduction...")
+
+        try:
+            output = llm(
+                full_prompt,
+                max_tokens=1024,
+                stop=["<|im_end|>"],
+                echo=False,
+                temperature=0.7,
+                top_p=0.9,
+                min_p=0.05,
+                repeat_penalty=1.05
+            )
+
+            raw_output = output['choices'][0]['text']
+            full_response = "```json" + raw_output
+
+            json_match = re.search(r"```json(.*?)```", full_response, re.DOTALL)
+            narrative_part = full_response
+            if json_match:
+                narrative_part = full_response.replace(json_match.group(0), "").strip()
+
+            dispatcher.utter_message(text=narrative_part)
+
+        except Exception as e:
+            print(f"ERREUR INTRO : {e}")
+            dispatcher.utter_message(text="Vous vous réveillez dans un lieu inconnu... (Erreur génération)")
+
+        return []
     
 class ValidateAdventureForm(FormValidationAction):
     def name(self) -> Text:
@@ -351,27 +424,24 @@ class ValidateAdventureForm(FormValidationAction):
             p_abilities = ", ".join(p_abilities)
         
         system_prompt = (
-            f"Tu es le Maître du Donjon (MJ) d'un jeu de rôle sombre et immersif. \n"
-            f"LANGUE DE RÉPONSE: Français littéraire et captivant. \n\n"
-            f"--- CONTEXTE ---\n"
-            f"Thème: {theme}\n"
-            f"Difficulté: {difficulty}\n"
-            f"Joueur: 1 ({p_race} {p_subrace}, {p_class}, Arme: {p_weapon}, Attribut: {p_attribute})\n"
-            f"Capacités: {p_abilities}\n\n"
-            f"--- RÈGLES D'OR DU MJ (À RESPECTER IMPÉRATIVEMENT) ---\n"
-            f"1. **SOIS PROACTIF** : Ne demande pas constamment 'Que faites-vous ?'. Fais avancer l'histoire. Introduis des événements soudains (une embuscade, un cri, un effondrement, une découverte macabre).\n"
-            f"2. **AMBIANCE** : Utilise les 5 sens. Ne dis pas 'il y a une rivière', dis 'l'odeur de la vase vous prend à la gorge et le clapotis de l'eau masque le bruit de pas derrière vous'.\n"
-            f"3. **GESTION DU RYTHME** : \n"
-            f"   - Si le joueur fait une action simple ('Je marche'), avance l'histoire de plusieurs heures jusqu'au prochain danger ou point d'intérêt. Ne décris pas chaque pas.\n"
-            f"   - Si le joueur explore, révèle un secret ou un danger immédiatement.\n"
-            f"4. **COMBAT ET DANGER** :\n"
-            f"   - Si la situation est dangereuse, n'attends pas. Fais attaquer les ennemis !\n"
-            f"   - Prends en compte la difficulté ({difficulty}). Si c'est 'Difficile', les ennemis sont vicieux et tendent des pièges.\n"
-            f"5. **SYSTÈME DE JEU** :\n"
-            f"   - Si une action est incertaine, demande un jet de dé (D20).\n"
-            f"   - Si le joueur dit 'Je lance le dé', tu dois SIMULER le résultat toi-même (ex: 'Vous obtenez un 14. Suffisant pour...').\n"
-            f"   - Décris les conséquences d'un échec de manière punitive mais amusante.\n"
-            f"6. **DÉBUT DE PARTIE** : Si le joueur dit 'Commencer', ne pose pas de question. Lance-le directement in media res (au milieu de l'action ou face à un mystère immédiat) en lien avec le thème {theme}."
+            "Tu es le Maître du Donjon (MD), une IA experte en narration interactive pour Donjons & Dragons 5e Édition. "
+            "Ton rôle est de créer une aventure immersive en français, tout en validant rigoureusement les règles.\n\n"
+            "OBJECTIFS :\n"
+            "1. NARRATION : Riche, sensorielle, réactive.\n"
+            "2. ARBITRAGE : Valide la faisabilité de chaque action (portée, inventaire).\n"
+            "3. FORMAT STRICT : Ta réponse doit ABSOLUMENT commencer par un bloc JSON (ValidateAdventureForm) suivi de la narration.\n\n"
+            "FORMAT ATTENDU :\n"
+            "```json\n"
+            "{\n"
+            '  "action_valide": boolean,\n'
+            '  "raison_refus": "string ou null",\n'
+            '  "jets_requis": "string ou null",\n'
+            '  "changements_etat": "string"\n'
+            "}\n"
+            "```\n"
+            "Après le JSON, écris la narration. Si l'action est invalide, décris l'échec. Sinon, décris l'action.\n\n"
+            "INTERDICTION FORMELLE DE T'ARRÊTER APRÈS LE JSON. SI TU NE RACONTES RIEN, LE JEU PLANTE."
+            f"CONTEXTE ACTUEL : Joueur {p_race}, Sous-race {p_subrace}, Classe {p_class}, Arme {p_weapon}, Capacité {p_abilities}, Attribut {p_attribute}. Thème {theme}, Difficulté {difficulty}."
         )
 
         start_index = 0
@@ -390,48 +460,62 @@ class ValidateAdventureForm(FormValidationAction):
 
 
         history_text = ""
-        for event in past_events:
-            if event['event'] == 'user' and event.get('text'):
-                # Format Mistral : [INST] Message [/INST]
-                history_text += f"[INST] {event.get('text')} [/INST]"
-            elif event['event'] == 'bot' and event.get('text'):
-                # Format Mistral : Réponse </s>
-                history_text += f"{event.get('text')} </s>"
-
-        if not past_events:
-            history_text = " C'est le début de l'histoire, tu donneras le contexte."
-
-        print(f"DEBUG: HISTORIQUE DE LA CONVERSATION : \n" + history_text)
-
+        
+        for event in past_events: 
+            if event.get("event") == "user" and event.get("text"):
+                history_text += f"<|im_start|>user\n{event.get('text')}<|im_end|>\n"
+            elif event.get("event") == "bot" and event.get("text"):
+                clean_msg = re.sub(r"```json.*?```", "", event.get('text'), flags=re.DOTALL).strip()
+                if clean_msg:
+                    history_text += f"<|im_start|>assistant\n{clean_msg}<|im_end|>\n"
+        
         current_message = slot_value
 
+
         full_prompt = (
-            f"<s>[INST] {system_prompt} [/INST] </s>"
+            f"<|im_start|>system\n{system_prompt}<|im_end|>\n"
             f"{history_text}"
-            f"[INST] {current_message} [/INST]"
+            f"<|im_start|>user\n{current_message}<|im_end|>\n"
+            f"<|im_start|>assistant\n```json" 
         )
         print("DEBUG: Envoi au LLM...")
         
         try:
             start_time = time.time()
+            
             output = llm(
                 full_prompt,
-                max_tokens=900,
-                stop=["</s>", "[/INST]"],
+                max_tokens=1024,
+                stop=["<|im_end|>"],
                 echo=False,
                 temperature=0.7,
-                top_p=0.9
+                top_p=0.9,
+                min_p=0.05, 
+                repeat_penalty=1.05
             )
 
             end_time = time.time()
 
+            raw_output = output['choices'][0]['text']
+
+            full_response = "```json" + raw_output
+            
             duration = end_time - start_time
 
             print(f"DEBUG: Génération terminée en {duration:.2f} secondes.")
 
-            response_text = output['choices'][0]['text'].strip()
+            json_match = re.search(r"```json(.*?)```", full_response, re.DOTALL)
+
+            narrative_part = full_response
+
+            if json_match:
+                text_only = full_response.replace(json_match.group(0), "").strip()
+                if text_only:
+                    narrative_part = text_only
+                else:
+                    narrative_part = "(Action prise en compte, mais le Maître du Donjon reste silencieux. Que faites-vous ensuite ?)"
             
-            dispatcher.utter_message(text=response_text)
+            dispatcher.utter_message(text=narrative_part)
             
         except Exception as e:
             print(f"ERREUR LLM : {e}")
@@ -647,3 +731,43 @@ class ActionGiveHelp(Action):
             )
         )
         return []
+class ActionSmartUndo(Action):
+
+    def name(self) -> Text:
+        return "action_undo"
+
+    def get_last_modified_slot(self, tracker: Tracker) -> Text:
+        """
+        Parcourt l'historique à l'envers pour trouver le dernier slot rempli par l'utilisateur.
+        """
+        for event in reversed(tracker.events):
+            if event.get("event") == "slot" and event.get("value") is not None:
+                slot_name = event.get("name")
+                
+                if slot_name != "requested_slot":
+                    return slot_name
+        return None
+
+    def run(self, dispatcher: CollectingDispatcher,
+            tracker: Tracker,
+            domain: Dict[Text, Any]) -> List[Dict[Text, Any]]:
+
+        active_loop = tracker.active_loop.get('name') if tracker.active_loop else None
+
+        if active_loop:
+            last_slot_name = self.get_last_modified_slot(tracker)
+
+            if last_slot_name:
+                dispatcher.utter_message(text=f"D'accord, j'efface votre choix pour '{last_slot_name}'.")
+                
+                return [
+                    SlotSet(last_slot_name, None),
+                    FollowupAction(active_loop) 
+                ]
+            else:
+                dispatcher.utter_message(text="Je ne trouve rien à annuler dans ce formulaire.")
+                return []
+
+        else:
+            dispatcher.utter_message(text="Retour en arrière...")
+            return [UserUtteranceReverted(), UserUtteranceReverted()]

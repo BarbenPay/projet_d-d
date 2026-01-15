@@ -33,6 +33,8 @@ intents:
     use_entities: true
 - nlu_fallback:
     use_entities: true
+- undo:
+    use_entities: true
 entities:
 - accessibility
 - theme
@@ -52,37 +54,37 @@ slots:
   theme:
     type: rasa.shared.core.slots.TextSlot
     initial_value: null
-    auto_fill: true
+    auto_fill: false
     influence_conversation: true
   difficulty:
     type: rasa.shared.core.slots.TextSlot
     initial_value: null
-    auto_fill: true
+    auto_fill: false
     influence_conversation: true
   race:
     type: rasa.shared.core.slots.TextSlot
     initial_value: null
-    auto_fill: true
+    auto_fill: false
     influence_conversation: true
   subrace:
     type: rasa.shared.core.slots.TextSlot
     initial_value: null
-    auto_fill: true
+    auto_fill: false
     influence_conversation: true
   class:
     type: rasa.shared.core.slots.TextSlot
     initial_value: null
-    auto_fill: true
+    auto_fill: false
     influence_conversation: true
   weapon:
     type: rasa.shared.core.slots.TextSlot
     initial_value: null
-    auto_fill: true
+    auto_fill: false
     influence_conversation: true
   attribute:
     type: rasa.shared.core.slots.TextSlot
     initial_value: null
-    auto_fill: true
+    auto_fill: false
     influence_conversation: true
   adventure_text:
     type: rasa.shared.core.slots.TextSlot
@@ -97,6 +99,11 @@ slots:
   ability_subrace:
     type: rasa.shared.core.slots.TextSlot
     initial_value: Aucune
+    auto_fill: true
+    influence_conversation: false
+  requested_slot:
+    type: rasa.shared.core.slots.UnfeaturizedSlot
+    initial_value: null
     auto_fill: true
     influence_conversation: false
 responses:
@@ -139,10 +146,12 @@ responses:
       - Attributs {attribute}
 
       Est-ce que cela vous convient ?
+  utter_ask_if_the_user_is_ready_to_start:
+  - text: Prêt à lancer l'aventure ?
   utter_ask_adventure_text:
   - text: Que faites-vous ?
   utter_ask_attribute:
-  - text: Qu'est ce qui représente le mieux votre personnage ? 
+  - text: Qu'est ce qui représente le mieux votre personnage ?
   utter_ask_rephrase:
   - text: Je n'ai pas bien compris. Peux-tu reformuler ?
   utter_default:
@@ -153,9 +162,16 @@ actions:
 - action_ask_class
 - action_ask_race
 - validate_caracter_creation_form
+- action_start_adventure
 - validate_adventure_form
 - action_give_help
+- action_undo
 forms:
+  game_accessibility_form:
+    required_slots:
+      accessibility:
+      - entity: accessibility
+        type: from_entity
   game_settings_form:
     required_slots:
       difficulty:
@@ -184,6 +200,8 @@ forms:
   adventure_form:
     required_slots:
       adventure_text:
-      - not_intent: user_choose_reset
+      - not_intent:
+        - user_choose_reset
+        - undo
         type: from_text
 e2e_actions: []
