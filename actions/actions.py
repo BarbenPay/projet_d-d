@@ -29,7 +29,7 @@ def get_llm():
 
     # --- CHANGEMENT ICI ---
     # On pointe maintenant vers le dossier monté "/app/models"
-    model_path = "/app/models/qwen2.5-3b-instruct-q4_k_m.gguf"
+    model_path = "/app/models/mistral-7b-instruct-v0.2.Q3_K_M.gguf"
 
     if not os.path.exists(model_path):
         print(f"DEBUG: Modèle introuvable à l'emplacement : {model_path}")
@@ -40,7 +40,7 @@ def get_llm():
     try:
         _llm_instance = Llama(
             model_path=model_path,
-            n_ctx=2048,
+            n_ctx=8192,
             n_threads=6,
             verbose=False
         )
@@ -356,26 +356,27 @@ class ValidateAdventureForm(FormValidationAction):
             p_abilities = ", ".join(p_abilities)
         
         system_prompt = (
-            f"Tu es un Maître du Donjon (MJ) expert pour un jeu de rôle textuel. \n"
-            f"LANGUE DE RÉPONSE: Français. \n\n"
-            f"--- PARAMÈTRES DE LA PARTIE ---\n"
+            f"Tu es le Maître du Donjon (MJ) d'un jeu de rôle sombre et immersif. \n"
+            f"LANGUE DE RÉPONSE: Français littéraire et captivant. \n\n"
+            f"--- CONTEXTE ---\n"
             f"Thème: {theme}\n"
             f"Difficulté: {difficulty}\n"
-            f"Nombre de joueurs: 1\n\n"
-            f"--- FICHE PERSONNAGE ---\n"
-            f"Race: {p_race} ({p_subrace})\n"
-            f"Classe: {p_class}\n"
-            f"Arme principale: {p_weapon}\n"
-            f"Attribut majeur: {p_attribute}\n"
-            f"Capacités spéciales: {p_abilities}\n\n"
-            f"PV du personnage: 20"
-            f"--- INSTRUCTIONS ---\n"
-            f"1. Tu dois décrire l'action, l'environnement et les réactions des PNJ de manière immersive.\n"
-            f"2. Prends en compte la difficulté ({difficulty}) pour décider si les actions du joueur réussissent ou échouent.\n"
-            f"3. Sois concis : Ne fais pas de monologues trop longs (max 5-6 phrases).\n"
-            f"4. Ne joue JAMAIS à la place du joueur. C'est le joueur qui prend des décision dans son histoire pas toi. \n"
-            f"Tu attendras toujours une décision du joueur mais tu ne demandera jamais au joueur ce qu'il veut faire. \n"
-            f"Par exemple lors d'une action importante comme un combat tu passeras en mode tour par tour en demandant à chaque fois à l'utilisateur ce qu'il veut faire."
+            f"Joueur: 1 ({p_race} {p_subrace}, {p_class}, Arme: {p_weapon}, Attribut: {p_attribute})\n"
+            f"Capacités: {p_abilities}\n\n"
+            f"--- RÈGLES D'OR DU MJ (À RESPECTER IMPÉRATIVEMENT) ---\n"
+            f"1. **SOIS PROACTIF** : Ne demande pas constamment 'Que faites-vous ?'. Fais avancer l'histoire. Introduis des événements soudains (une embuscade, un cri, un effondrement, une découverte macabre).\n"
+            f"2. **AMBIANCE** : Utilise les 5 sens. Ne dis pas 'il y a une rivière', dis 'l'odeur de la vase vous prend à la gorge et le clapotis de l'eau masque le bruit de pas derrière vous'.\n"
+            f"3. **GESTION DU RYTHME** : \n"
+            f"   - Si le joueur fait une action simple ('Je marche'), avance l'histoire de plusieurs heures jusqu'au prochain danger ou point d'intérêt. Ne décris pas chaque pas.\n"
+            f"   - Si le joueur explore, révèle un secret ou un danger immédiatement.\n"
+            f"4. **COMBAT ET DANGER** :\n"
+            f"   - Si la situation est dangereuse, n'attends pas. Fais attaquer les ennemis !\n"
+            f"   - Prends en compte la difficulté ({difficulty}). Si c'est 'Difficile', les ennemis sont vicieux et tendent des pièges.\n"
+            f"5. **SYSTÈME DE JEU** :\n"
+            f"   - Si une action est incertaine, demande un jet de dé (D20).\n"
+            f"   - Si le joueur dit 'Je lance le dé', tu dois SIMULER le résultat toi-même (ex: 'Vous obtenez un 14. Suffisant pour...').\n"
+            f"   - Décris les conséquences d'un échec de manière punitive mais amusante.\n"
+            f"6. **DÉBUT DE PARTIE** : Si le joueur dit 'Commencer', ne pose pas de question. Lance-le directement in media res (au milieu de l'action ou face à un mystère immédiat) en lien avec le thème {theme}."
         )
 
         start_index = 0
@@ -396,31 +397,34 @@ class ValidateAdventureForm(FormValidationAction):
         history_text = ""
         for event in past_events:
             if event['event'] == 'user' and event.get('text'):
-                history_text += f"<|im_start|>user\n{event.get('text')}<|im_end|>\n"
+                # Format Mistral : [INST] Message [/INST]
+                history_text += f"[INST] {event.get('text')} [/INST]"
             elif event['event'] == 'bot' and event.get('text'):
-                history_text += f"<|im_start|>assistant\n{event.get('text')}<|im_end|>\n"
+                # Format Mistral : Réponse </s>
+                history_text += f"{event.get('text')} </s>"
+
+        if not past_events:
+            history_text = " C'est le début de l'histoire, tu donneras le contexte."
 
         print(f"DEBUG: HISTORIQUE DE LA CONVERSATION : \n" + history_text)
 
         current_message = slot_value
 
         full_prompt = (
-            f"<|im_start|>system\n{system_prompt}<|im_end|>\n"
+            f"<s>[INST] {system_prompt} [/INST] </s>"
             f"{history_text}"
-            f"<|im_start|>user\n{current_message}<|im_end|>\n"
-            f"<|im_start|>assistant\n"
+            f"[INST] {current_message} [/INST]"
         )
-
         print("DEBUG: Envoi au LLM...")
         
         try:
             start_time = time.time()
             output = llm(
                 full_prompt,
-                max_tokens=450,
-                stop=["<|eot_id|>", "<|start_header_id|>"],
+                max_tokens=900,
+                stop=["</s>", "[/INST]"],
                 echo=False,
-                temperature=0.8,
+                temperature=0.7,
                 top_p=0.9
             )
 

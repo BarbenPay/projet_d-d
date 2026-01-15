@@ -215,7 +215,7 @@ nlu:
     - mettre le thème sur [mystère](theme)
     - style [épique](theme)
     - [investigation](theme)
-    - [medieval] (theme)
+    - [medieval](theme)
 
 - intent: user_choose_difficulty
   examples: |
