@@ -20,7 +20,7 @@ def get_llm():
 
     print("⏳ Initialisation du chargement du LLM...")
 
-    mem_before = print_memory_usage("Avant chargement du modèle")
+    #mem_before = print_memory_usage("Avant chargement du modèle")
     
     try:
         from llama_cpp import Llama
@@ -28,8 +28,6 @@ def get_llm():
         print("DEBUG: llama-cpp-python n'est pas installé.")
         return None
 
-    # --- CHANGEMENT ICI ---
-    # On pointe maintenant vers le dossier monté "/app/models"
     model_path = "/app/models/qwen2.5-3b-instruct-q4_k_m.gguf"
 
     if not os.path.exists(model_path):
@@ -42,15 +40,16 @@ def get_llm():
         _llm_instance = Llama(
             model_path=model_path,
             n_ctx=2048,
+            n_ctx=2048,
             n_threads=6,
             verbose=False
         )
 
-        mem_after = print_memory_usage("Après chargement du modèle")
+        #mem_after = print_memory_usage("Après chargement du modèle")
 
-        diff = mem_after - mem_before
+        #diff = mem_after - mem_before
 
-        print(f"DEBUG: Poids estimé du modèle en RAM : {diff:.2f} MB")
+        #print(f"DEBUG: Poids estimé du modèle en RAM : {diff:.2f} MB")
 
         print(f"DEBUG: Modèle chargé avec succès depuis {model_path}")
         return _llm_instance
@@ -59,11 +58,11 @@ def get_llm():
         return None
     
 
-def print_memory_usage(step_name=""):
-    process = psutil.Process(os.getpid())
-    ram_mb = process.memory_info().rss / 1024 / 1024 
-    print(f"DEBUG: Mémoire consommée par le LLM {step_name} : {ram_mb:.2f} MB utilisés")
-    return ram_mb
+# def print_memory_usage(step_name=""):
+#     process = psutil.Process(os.getpid())
+#     ram_mb = process.memory_info().rss / 1024 / 1024 
+#     print(f"DEBUG: Mémoire consommée par le LLM {step_name} : {ram_mb:.2f} MB utilisés")
+#     return ram_mb
 
 dictWeaponPossibilityDependingClass = {
             "paladin": ["épée longue", "marteau", "bouclier", "masse", "épée"],
@@ -474,10 +473,12 @@ class ValidateAdventureForm(FormValidationAction):
 
         full_prompt = (
             f"<|im_start|>system\n{system_prompt}<|im_end|>\n"
+            f"<|im_start|>system\n{system_prompt}<|im_end|>\n"
             f"{history_text}"
             f"<|im_start|>user\n{current_message}<|im_end|>\n"
             f"<|im_start|>assistant\n```json" 
         )
+
         print("DEBUG: Envoi au LLM...")
         
         try:
@@ -616,7 +617,6 @@ class ActionGiveHelp(Action):
                     f"A cette etape, je te demande la sous-race pour : {race}.\n"
                     "Choix possibles :\n"
                     + "\n".join(lines)
-                    + "\nExemple : des montagnes"
                 )
             )
             return []
@@ -634,7 +634,6 @@ class ActionGiveHelp(Action):
                     f"Choix possibles : {pretty_list(classes)}.\n\n"
                     "Details :\n"
                     + "\n".join(lines)
-                    + "\n\nExemple : barbare"
                 )
             )
             return []
@@ -646,7 +645,7 @@ class ActionGiveHelp(Action):
                 dispatcher.utter_message(
                     text=(
                         "A cette etape, je te demande une arme, mais je n'ai pas encore ta classe.\n"
-                        "Choisis d'abord une classe (wizard, rogue, paladin, barbarian, ranger, monk, sorcerer, druid, bard), puis je te donnerai toutes les armes autorisees."
+                        "Choisis d'abord une classe (paladin, roublard, magicien, druide, moine, barbare, barde, rôdeur, sorcier), puis je te donnerai toutes les armes autorisees."
                     )
                 )
                 return []
@@ -664,7 +663,6 @@ class ActionGiveHelp(Action):
                 text=(
                     f"A cette etape, je te demande de choisir une arme pour la classe : {p_class}.\n"
                     f"Choix possibles : {pretty_list(allowed)}.\n"
-                    "Exemple : staff"
                 )
             )
             return []
@@ -771,3 +769,22 @@ class ActionSmartUndo(Action):
         else:
             dispatcher.utter_message(text="Retour en arrière...")
             return [UserUtteranceReverted(), UserUtteranceReverted()]
+class ActionUpdateInterfaceMode(Action):
+
+    def name(self) -> str:
+        return "action_update_interface_mode"
+
+    def run(self, dispatcher: CollectingDispatcher,
+            tracker: Tracker,
+            domain: dict) -> list:
+
+        mode_choisi = tracker.get_slot("accessibility")
+        
+        mode_technique = "text"
+
+        if mode_choisi and mode_choisi.lower() in ["audio", "voix", "voice", "oral", "parler", "parole"]:
+            mode_technique = "audio"
+
+        dispatcher.utter_message(json_message={"set_mode": mode_technique})
+
+        return []

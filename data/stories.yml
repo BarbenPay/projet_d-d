@@ -7,6 +7,7 @@ stories:
   - active_loop: game_settings_form
   - active_loop: null
   - action: utter_confirm_settings_game
+  - action: action_update_interface_mode
   - intent: affirm
   
   - action: game_settings_form

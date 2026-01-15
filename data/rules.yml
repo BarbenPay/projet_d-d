@@ -95,3 +95,14 @@ rules:
   - slot_was_set:
     - requested_slot: null
   - action: utter_confirm_story
+
+- rule: Appliquer le changement de mode interface
+  steps:
+  - intent: accessibility_selection
+  - action: utter_confirm_settings_game
+  - action: action_update_interface_mode
+
+- rule: Demander confirmation si confiance moyenne
+  steps:
+  - intent: nlu_fallback
+  - action: action_two_stage_fallback

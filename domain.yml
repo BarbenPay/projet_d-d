@@ -164,6 +164,7 @@ actions:
 - validate_caracter_creation_form
 - action_start_adventure
 - validate_adventure_form
+- action_update_interface_mode
 - action_give_help
 - action_undo
 forms:
