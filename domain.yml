@@ -142,12 +142,11 @@ responses:
   utter_ask_adventure_text:
   - text: Que faites-vous ?
   utter_ask_attribute:
-  - text: Qu'est ce qui représente le mieux votre personnage ? 
+  - text: Qu'est ce qui représente le mieux votre personnage ?
   utter_ask_rephrase:
   - text: Je n'ai pas bien compris. Peux-tu reformuler ?
   utter_default:
   - text: Désolé, je ne comprends vraiment pas ce que tu veux dire.
-  
 actions:
 - action_ask_subrace
 - action_ask_weapon
@@ -157,7 +156,6 @@ actions:
 - validate_adventure_form
 - action_update_interface_mode
 - action_give_help
-
 forms:
   game_settings_form:
     required_slots:
