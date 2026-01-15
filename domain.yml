@@ -113,9 +113,9 @@ responses:
   utter_start_story_settings:
   - text: Parfait ! Commencons par choisir les paramètres de votre histoire.
   utter_ask_theme:
-  - text: Quel thème voulez vous pour votre aventure (medevial, cyberpunk, fantaisie, ...)?
+  - text: Quel thème voulez vous pour votre aventure ?
   utter_ask_difficulty:
-  - text: Choisissez une difficulté (facile, normal, difficile, ...).
+  - text: Choisissez une difficulté.
   utter_confirm_story:
   - text: |
       Voici la configuration de l'histoire:
@@ -126,9 +126,9 @@ responses:
   utter_start_creation_character:
   - text: Parfait ! Commencons par créer votre personnage.
   utter_ask_race:
-  - text: Choisissez une race (elf, nain, humain, drow, gnome, drakéide).
+  - text: Choisissez une race.
   utter_ask_class:
-  - text: Choisissez une classe (paladin, roublard, sorcier, druide, moine, barbare, barde, roder, magicien).
+  - text: Choisissez une classe.
   utter_confirm_character:
   - text: |
       Voici votre personnage :
@@ -142,7 +142,7 @@ responses:
   utter_ask_adventure_text:
   - text: Que faites-vous ?
   utter_ask_attribute:
-  - text: Qu'est ce qui représente le mieux votre personnage ? (Force, Intelligence, Charisme, ...)
+  - text: Qu'est ce qui représente le mieux votre personnage ? 
   utter_ask_rephrase:
   - text: Je n'ai pas bien compris. Peux-tu reformuler ?
   utter_default:
@@ -154,7 +154,10 @@ actions:
 - action_ask_race
 - validate_caracter_creation_form
 - validate_adventure_form
+<<<<<<< HEAD
 - action_update_interface_mode
+=======
+>>>>>>> 4f49b3e4261e4ca4a57340306009397791bf4f8f
 - action_give_help
 forms:
   game_settings_form:
